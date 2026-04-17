@@ -1,0 +1,202 @@
+﻿@model List<Bonus>
+@{
+    ViewData["Title"] = "Мотивация";
+    var positionId = ViewBag.PositionId;
+}
+
+<div class="container-fluid">
+    <div class="px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>Настройка мотивации должности</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Настройки</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body p-0">
+                    <input type="hidden" id="position-id" value="@positionId" />
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Название бонуса</th>
+                                <th style="width: 100px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="bonuses-tbody">
+                            @foreach (var bonus in Model)
+                            {
+                                <tr class="bonus-row" data-bonus-id="@bonus.Id" data-label="@bonus.Label">
+                                    <td class="bonus-label-cell">@bonus.Label</td>
+                                    <td>
+                                        <a href="#" class="edit-toggle-btn text-primary me-2" data-mode="view">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="#" class="delete-button text-danger" data-id="@bonus.Id">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2">
+                                    <button type="button" class="btn btn-success btn-sm" id="create-bonus-btn">
+                                        <i class="bi bi-plus-circle me-1"></i>Создать бонус
+                                    </button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .bonus-row { cursor: pointer; }
+        .bonus-row:hover { background-color: #f8f9fa; }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            const $tbody = $('#bonuses-tbody');
+            const positionId = $('#position-id').val();
+
+            addModalDelete('Вы действительно хотите удалить этот бонус и все связанные градации?', '/Bonus/Delete');
+
+            $tbody.on('click', '.bonus-row', function(e) {
+                if ($(e.target).closest('a, button, input').length) return;
+                
+                const $row = $(this);
+                const bonusId = $row.data('bonus-id');
+                const $gradationsRow = $(`#gradations-${bonusId}`);
+                
+                if ($gradationsRow.length) {
+                    $gradationsRow.toggle();
+                } else {
+                    $.get(`/Bonus/GetGradations/${bonusId}`)
+                        .done(html => {
+                            $row.after(html);
+                            addModalDelete('Вы действительно хотите удалить эту градацию?', '/Bonus/DeleteGradation');
+                        });
+                }
+            });
+
+            $tbody.on('click', '.edit-toggle-btn', function(e) {
+                e.stopPropagation();
+                const $btn = $(this);
+                const $row = $btn.closest('tr');
+                const mode = $btn.data('mode');
+                
+                if (mode === 'view') {
+                    const label = $row.data('label');
+                    $row.find('.bonus-label-cell').html(`<input type="text" class="form-control form-control-sm edit-input" value="${label}" />`);
+                    $btn.data('mode', 'edit');
+                    $btn.find('i').removeClass('bi-pencil').addClass('bi-check-lg');
+                    $btn.removeClass('text-primary').addClass('text-success');
+                } else {
+                    const id = $row.data('bonus-id');
+                    const newLabel = $row.find('.edit-input').val();
+                    
+                    $.post('/Bonus/Update', { Id: id, Label: newLabel })
+                        .done(() => {
+                            $row.data('label', newLabel);
+                            $row.find('.bonus-label-cell').text(newLabel);
+                            $btn.data('mode', 'view');
+                            $btn.find('i').removeClass('bi-check-lg').addClass('bi-pencil');
+                            $btn.removeClass('text-success').addClass('text-primary');
+                        })
+                        .fail(() => alert('Ошибка сохранения'));
+                }
+            });
+
+            $tbody.on('click', '.edit-gradation-toggle', function(e) {
+                e.stopPropagation();
+                const $btn = $(this);
+                const $row = $btn.closest('tr');
+                const mode = $btn.data('mode');
+                
+                if (mode === 'view') {
+                    const label = $row.data('label');
+                    const price = $row.data('price');
+                    $row.find('.gradation-label-cell').html(`<input type="text" class="form-control form-control-sm edit-label-input" value="${label}" />`);
+                    $row.find('.gradation-price-cell').html(`<input type="number" class="form-control form-control-sm edit-price-input" value="${price}" step="0.01" min="0" />`);
+                    $btn.data('mode', 'edit');
+                    $btn.find('i').removeClass('bi-pencil').addClass('bi-check-lg');
+                    $btn.removeClass('text-primary').addClass('text-success');
+                } else {
+                    const id = $row.data('gradation-id');
+                    const newLabel = $row.find('.edit-label-input').val();
+                    const newPrice = $row.find('.edit-price-input').val();
+                    
+                    $.post('/Bonus/UpdateGradation', { Id: id, Label: newLabel, Price: newPrice })
+                        .done(() => {
+                            $row.data('label', newLabel);
+                            $row.data('price', newPrice);
+                            $row.find('.gradation-label-cell').text(newLabel);
+                            $row.find('.gradation-price-cell').text(parseFloat(newPrice).toFixed(2));
+                            $btn.data('mode', 'view');
+                            $btn.find('i').removeClass('bi-check-lg').addClass('bi-pencil');
+                            $btn.removeClass('text-success').addClass('text-primary');
+                        })
+                        .fail(() => alert('Ошибка сохранения'));
+                }
+            });
+
+            $('#create-bonus-btn').on('click', function() {
+                $.get('/Bonus/CreateForm')
+                    .done(html => $tbody.append(html));
+            });
+
+            $tbody.on('click', '.save-bonus', function() {
+                const $row = $(this).closest('tr');
+                const label = $row.find('.bonus-label-input').val();
+                
+                $.post('/Bonus/Create', { label, positionId })
+                    .done(() => location.reload())
+                    .fail(() => alert('Ошибка сохранения'));
+            });
+
+            $tbody.on('click', '.cancel-bonus', function() {
+                $(this).closest('tr').remove();
+            });
+
+            $tbody.on('click', '.create-gradation', function() {
+                const bonusId = $(this).data('bonus-id');
+                const $gradationsTbody = $(`#gradations-tbody-${bonusId}`);
+                
+                $.get(`/Bonus/CreateGradationForm/${bonusId}`)
+                    .done(html => $gradationsTbody.append(html));
+            });
+
+            $tbody.on('click', '.save-gradation', function() {
+                const $row = $(this).closest('tr');
+                const bonusId = $row.data('bonus-id');
+                const label = $row.find('.gradation-label-input').val();
+                const price = $row.find('.gradation-price-input').val();
+                
+                $.post('/Bonus/CreateGradation', { bonusId, label, price })
+                    .done(() => location.reload())
+                    .fail(() => alert('Ошибка сохранения'));
+            });
+
+            $tbody.on('click', '.cancel-gradation', function() {
+                $(this).closest('tr').remove();
+            });
+        });
+    </script>
+}

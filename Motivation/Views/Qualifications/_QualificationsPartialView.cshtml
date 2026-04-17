@@ -1,0 +1,37 @@
+﻿@model QualificationsViewModel
+
+@{
+    <tr class="table-row empty-table-identificator" @(Model.Qualifications.Any() ? "style=display:none;" : "")>
+        <td class="col-3">Тут пока ничего нет</td>
+        <td class="col-7"></td>
+        <td class="col-2"></td>
+        <td style="min-width: 55px;"></td>
+    </tr>
+
+    foreach (var qualification in Model.Qualifications)
+    {
+        <tr class="table-row">
+            <td class="col-3 ps-3">
+                <a href="#" data-pk="@qualification.Id" data-position-id="@qualification.PositionId" data-type="text" class="name-edit editable-disabled editable-click">
+                    @qualification.Name
+                </a>
+            </td>
+
+            <td class="col-7 ps-3">
+                <a href="#" data-pk="@qualification.Id" data-position-id="@qualification.PositionId" data-type="text" class="points-edit editable-disabled editable-click">
+                    @qualification.Points
+                </a>
+            </td>
+
+            <td class="col-2 text-center update-column">
+                @qualification.Updated.ToLocalTime()
+            </td>
+
+            <td style="min-width: 55px;" class="hidden-mobile">
+                <button data-id="@qualification.Id" data-value="@qualification.Name" class="btn btn-danger collapse p-0 delete-button">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </td>
+        </tr>
+    }
+}

@@ -1,0 +1,218 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <title>@ViewData["Title"] - Motivation</title>
+
+    <!-- Favicons -->
+    <link href="~/images/favicon.png" rel="icon">
+    <link href="~/images/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+
+    <!-- Vendor CSS Files -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/lib/boxicons/css/boxicons.min.css">
+    <link rel="stylesheet" href="~/lib/quill/quill.snow.css">
+    <link rel="stylesheet" href="~/lib/quill/quill.bubble.css">
+    <link rel="stylesheet" href="~/lib/remixicon/remixicon.css">
+    <link rel="stylesheet" href="~/lib/simple-datatables-2/style.css">
+    <link rel="stylesheet" href="~/lib/bootstrap-editable/css/bootstrap-editable.css">
+
+    <link rel="stylesheet" href="~/css/style.css">
+    <link rel="stylesheet" href="~/css/settings.css">
+
+    <script type="module" src="~/lib/simple-datatables-2/simple-datatables.js"></script>
+</head>
+
+<body>
+    <header id="header" class="header fixed-top d-flex align-items-center">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-list toggle-sidebar-btn" style="margin-right: 5%;"></i>
+            <a asp-controller="Home" asp-action="Index" class="logo d-flex align-items-center">
+                <img src="~/images/logo.png" alt="logo">
+                <span class="d-none d-lg-block">Background</span>
+            </a>
+        </div>
+
+        <nav class="header-nav ms-auto">
+            <partial name="_LoginPartial" />
+        </nav>
+    </header>
+
+    <aside id="sidebar" class="sidebar">
+        <ul class="sidebar-nav" id="sidebar-nav">
+            <li class="nav-item">
+                <a asp-controller="Statistics" asp-action="Index"
+                    class="nav-link @(Context.Request.Path.Value.Contains("Statistics") ? "active" : "collapsed")">
+                    <i class="bi bi-grid"></i>
+                    <span>Статистика</span>
+                </a>
+            </li>
+
+
+            <li class="nav-item">
+                <a asp-controller="Employees" asp-action="Index"
+                    class="nav-link @(Context.Request.Path.Value.Contains("Employees") ? "active" : "collapsed")">
+                    <i class="bi bi-person"></i>
+                    <span>Сотрудники</span>
+                </a>
+            </li>
+
+
+            <li class="nav-item">
+                <a asp-controller="Shifts" asp-action="Index" asp-route-year="@DateTime.Now.Year"
+                    asp-route-month="@DateTime.Now.Month" asp-
+                    class="nav-link @(Context.Request.Path.Value.Contains("Shifts") ? "active" : "collapsed")">
+                    <i class="bi bi-calendar-week"></i>
+                    <span>Рабочее время</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a asp-controller="EmployeePenalties" asp-action="Index" asp-route-year="@DateTime.Now.Year"
+                    asp-route-month="@DateTime.Now.Month"
+                    class="nav-link @(Context.Request.Path.Value.Contains("EmployeePenalties") ? "active" : "collapsed")">
+                    <i class="bi bi-person-exclamation"></i>
+                    <span>Замечания</span>
+                </a>
+            </li>
+
+            @if (User.IsInRole("Admins"))
+            {
+                <li class="nav-item">
+                    <a asp-controller="Departments" asp-action="Index"
+                        class="nav-link @(Context.Request.Path.Value.Contains("Departments") ? "active" : "collapsed")">
+                        <i class="bi bi-building"></i>
+                        <span>Подразделения</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="SummarySheet" asp-action="Index"
+                        asp-route-year="@DateTime.Now.Year" asp-route-month="@DateTime.Now.Month"
+                        class="nav-link @(Context.Request.Path.Value.Contains("SummarySheet") ? "active" : "collapsed")">
+                        <i class="bi bi-building"></i>
+                        <span>Сводный лист</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Positions" asp-action="Index"
+                        class="nav-link @(Context.Request.Path.Value.Contains("Positions") ? "active" : "collapsed")">
+                        <i class="bi bi-diagram-3"></i>
+                        <span>Должности</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Qualifications" asp-action="Index"
+                        class="nav-link @(Context.Request.Path.Value.Contains("Qualifications") ? "active" : "collapsed")">
+                        <i class="bi bi-card-checklist"></i>
+                        <span>Квалификации</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Ranks" asp-action="Index"
+                        class="nav-link @(Context.Request.Path.Value.Contains("Ranks") ? "active" : "collapsed")">
+                        <i class="bi bi-bar-chart-line"></i>
+                        <span>Ранги</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Penalties" asp-action="Index"
+                        class="nav-link @(Context.Request.Path.Value.Contains("Penalties") ? "active" : "collapsed")">
+                        <i class="bi bi-journal-x"></i>
+                        <span>Штрафы</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="PointsOfInterest" asp-action="Index"
+                        class="nav-link @(Context.Request.Path.Value.Contains("Points") ? "active" : "collapsed")">
+                        <i class="bi bi-geo-alt"></i>
+                        <span>Точки интереса</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="Wages" asp-action="Index"
+                           class="nav-link @(Context.Request.Path.Value.Contains("Wages") ? "active" : "collapsed")">
+                        <i class="bi bi-currency-bitcoin"></i>
+                        <span>Заработная плата</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </aside>
+
+    <main id="main" class="main">
+        @RenderBody()
+    </main>
+
+    <div id="error-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="error-model-title" class="modal-title">Возникла ошибка!</h5>
+                </div>
+
+                <div id="error-modal-body" class="modal-body" style="font-size: 14px; word-wrap: break-word;">
+                    Неизвестная ошибка.
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ОК</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="confirm-delete-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="delete-modal-title" class="modal-title"></h5>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-button">Да</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/apexcharts/apexcharts.min.js"></script>
+    <script src="~/lib/chart.js/chart.umd.js"></script>
+    <script src="~/lib/echarts/echarts.min.js"></script>
+    <script src="~/lib/quill/quill.min.js"></script>
+    <script src="~/lib/tinymce/tinymce.min.js"></script>
+    <script src="~/lib/php-email-form/validate.js"></script>
+    <script src="~/lib/bootstrap-editable/js/bootstrap-editable.min.js"></script>
+    <script src="~/js/main.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync("Styles", required: false)
+</body>
+
+</html>

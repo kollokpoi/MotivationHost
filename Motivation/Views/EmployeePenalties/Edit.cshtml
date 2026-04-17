@@ -1,0 +1,137 @@
+﻿@model EditEmployeePenaltyViewModel
+
+@{
+    ViewData["Title"] = "Редактирование замечания";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>@ViewData["Title"]</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Компания</li>
+                        <li class="breadcrumb-item">Замечания</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body card-body pt-4 col-md-4">
+                <div>
+                    <form asp-controller="EmployeePenalties" asp-action="Edit" class="needs-validation" novalidate
+                        enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="Penalty" class="form-label">Штраф</label>
+                            <select class="form-select" id="Penalty" name="PenaltyId" required>
+                                <option value="" selected disabled>Выберите штраф</option>
+                                @foreach (var penalty in Model.Penalties)
+                                {
+                                    <!option @(penalty.Id == @Model.EmployeePenalty?.Penalty?.Id ? "selected" : "")
+                                        value="@penalty.Id">@penalty.Description</!option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">Пожалуйста, выберите замечание</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Employee" class="form-label">Сотрудник</label>
+                            <select class="form-select" id="Employee" name="EmployeeId" required>
+                                <option value="" selected disabled>Выберите сотрудника</option>
+                                @foreach (var employee in Model.Employees)
+                                {
+                                    <!option @(employee.Id == @Model.EmployeePenalty?.Employee.Id ? "selected" : "")
+                                        value="@employee.Id">@employee.GetFullName()</!option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">Пожалуйста, выберите сотрудника</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Explanation" class="form-label">Объяснение</label>
+                            <textarea class="form-control" name="Explanation" id="Explanation" rows="5"
+                                required>@Model.EmployeePenalty?.Explanation</textarea>
+                            <div class="invalid-feedback">Пожалуйста, введите комментарий</div>
+                        </div>
+                        <input type="hidden" name="AuthorId" value="@Model.EmployeePenalty.AuthorId">
+                        <input type="hidden" name="Id" value="@Model.EmployeePenalty?.Id" />
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-controller="EmployeePenalties" asp-action="Index"
+                                class="btn btn-secondary">Отмена</a>
+                            <button data-id="@Model.EmployeePenalty?.Id" id="deleteEmployeePenalty" class="btn btn-danger">
+                                Удалить
+                            </button>
+                            <button class="btn btn-primary" type="submit">Обновить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    $(document).ready(function () {
+        $('#deleteEmployeePenalty').on('click', function (e) {
+            e.preventDefault();
+
+            let id = $(this).data('id');
+
+            if (!confirm("Вы уверены, что хотите удалить замечание?")) {
+                return;
+            }
+
+            $.ajax({
+                url: `/EmployeePenalties/Delete`,
+                type: 'DELETE',
+                contentType: 'application/json',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                success: function (result) {
+                    window.location.href = '@Url.Action("Index", "EmployeePenalties")';
+                },
+                error: handleError,
+                data: JSON.stringify({
+                    Id: id
+                })
+            });
+        })
+    });
+</script>
+
+@* <script type="module">
+    $(document).ready(function () {
+        $('#deleteDepartment').on('click', function (e) {
+            e.preventDefault();
+            $('#delete-modal-title').text('Вы действительно хотите удалить это подразделение?')
+            $('#confirm-delete-modal').modal('show');
+        })
+
+        $('#confirm-delete-button').on("click", function () {
+            var id = $('#deleteDepartment').data('id');
+            console.log(id);
+            $.ajax({
+                url: '/Departments/Delete',
+                type: 'DELETE',
+                contentType: 'application/json',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                success: function (result) {
+                    window.location.href = '@Url.Action("Index", "Departments")'
+                },
+                error: handleError,
+                data: JSON.stringify({
+                    Id: id
+                })
+            });
+        })
+    });
+</script> *@

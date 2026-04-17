@@ -1,0 +1,61 @@
+﻿@model DepartmentViewModel
+
+<div class="col-4">
+    <div class="card" style="height: 95%;">
+        <div class="card-header">
+            <div class="row">
+                <div class="col my-auto">
+                    <h5>@Model.Department?.Name</h5>
+                </div>
+
+                <div class="col-md-auto col-sm-12 hidden-mobile">
+                    <a asp-controller="Departments" asp-action="Edit" asp-route-id="@Model.Department?.Id" class="btn btn-secondary" role="button">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body pt-3">
+            @{              
+                var budgetDifference = Model.Department?.Budget - Model.Department?.Expenses;
+                <h6 class="card-subtitle mb-2 text-body-secondary @(budgetDifference < 0 ? "negative-ammount" : "positive-ammount")">@budgetDifference?.ToString("C")</h6>
+            }
+            <div class="row mb-2">
+                <div class="col"><b>Фактический бюджет</b><br />@Model.Department?.Expenses.ToString("C")</div>
+                <div class="col"><b>Плановый бюджет</b><br />@Model.Department?.Budget.ToString("C")</div>
+            </div>
+
+            <div class="card-text mb-2"><b>Средний Ранг: </b>@Model.AverageRank</div>
+            <div class="card-text mb-2"><b>Менеджер: </b>@(Model.Manager != null ? Model.Manager.GetShortName() : "-")</div>
+
+            @if (Model.Employees.Any())
+            {
+                <div class="mb-2"><b>Сотрудники:</b></div>
+                <div class="row row-cols-auto mb-2 g-3">
+                    @foreach (var employee in Model.Employees)
+                    {
+                        <div class="col">
+                            <img src="@(string.IsNullOrEmpty(employee.Photo) ? "~/images/profile.png" : employee.Photo)" alt="Profile" class="rounded-circle" width="50" height="50"
+                                 data-bs-toggle="tooltip" 
+                                 data-bs-placement="bottom"
+                                 data-bs-custom-class="custom-tooltip"
+                                 data-bs-title="@employee.GetFullName()">
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (Model.ChildrenDepartments.Any())
+            {
+                <div><b>Подчиненные подразделения:</b></div>
+                <ul>
+                    @foreach (var department in Model.ChildrenDepartments)
+                    {
+                        <li>@department?.Name</li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>

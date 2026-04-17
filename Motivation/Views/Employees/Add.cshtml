@@ -1,0 +1,205 @@
+﻿@model AddEmployeeViewModel
+
+@{
+    ViewData["Title"] = "Добавление сотрудника";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>@ViewData["Title"]</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Настройки</li>
+                        <li class="breadcrumb-item">Сотрудники</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body">
+                <form asp-controller="Employees" asp-action="Add" class="needs-validation pt-3" novalidate="" enctype="multipart/form-data">
+                    <div class="row g-3">
+                        <div class="col-sm-4">
+                            <label for="LastName" class="form-label">Фамилия</label>
+                            <input type="text" class="form-control" id="LastName" name="LastName" placeholder="" value="" required="">
+                            <div class="invalid-feedback">
+                                Необходима валидная фамилия
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <label for="FirstName" class="form-label">Имя</label>
+                            <input type="text" class="form-control" id="FirstName" name="FirstName" placeholder="" value="" required="">
+                            <div class="invalid-feedback">
+                                Необходимо валидное имя
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <label for="MiddleName" class="form-label">Отчество</label>
+                            <input type="text" class="form-control" id="MiddleName" name="MiddleName" placeholder="" value="" required="">
+                            <div class="invalid-feedback">
+                                Необходима валидное отчество
+                            </div>
+                        </div>
+
+
+                        <div class="col-12">
+                            <label for="Email" class="form-label">Email</label>
+                            <div class="input-group has-validation">
+                                <span class="input-group-text">@@</span>
+                                <input type="email" class="form-control" id="Email" name="Email" placeholder="Email" required="">
+                                <div class="invalid-feedback">
+                                    Необходим валидный Email
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="Password" class="form-label">Пароль</label>
+                            <input type="password" class="form-control" id="Password" name="Password" placeholder="" value="" required="">
+                            <div class="invalid-feedback">
+                                Необходим валидный пароль
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="Photo" class="form-label">Фото</label>
+                            <div class="input-group">
+                                <input type="text" value="" id="Photo" class="form-control">
+                                <label for="PhotoFile" class="btn btn-outline-secondary">...</label>
+                                <input type="file" name="PhotoFile" hidden id="PhotoFile">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="StartTime" class="form-label">Начало работы</label>
+                            <select class="form-select" id="StartTime" name="StartTime" required="">
+                                @{
+                                    var startDate = new DateTime(1, 1, 1);
+                                    var endDate = new DateTime(1, 1, 2);
+                                    for (var date = startDate; date < endDate; date = date.AddHours(1))
+                                    {
+                                        <option value="@date">@date.ToString("HH:mm")</option>
+                                    }
+                                }
+                            </select>
+                            <div class="invalid-feedback">
+                                Пожалуйста, выберите валидное начало работы
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="EndTime" class="form-label">Конец работы</label>
+                            <select class="form-select" id="EndTime" name="EndTime" required="">
+                                @for (var date = startDate; date < endDate; date = date.AddHours(1))
+                                {
+                                    <option value="@date">@date.ToString("HH:mm")</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">
+                                Пожалуйста, выберите валидный конец работы
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="country" class="form-label">Подразделение</label>
+                            <select class="form-select" id="Department" name="DepartmentId" required="">
+                                @foreach (var department in Model.Departments)
+                                {
+                                    <option value="@department.Id">@department.Name</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">
+                                Пожалуйста, выберите валидное подразделение
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="state" class="form-label">Должность</label>
+                            <select class="form-select" id="Position" name="PositionId" required="">
+                                @foreach (var position in Model.Positions)
+                                {
+                                    <option value="@position.Id">@position.Name</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">
+                                Пожалуйста, выберите валидную должность
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="state" class="form-label">Квалификация</label>
+                            <select class="form-select" id="Qualification" name="QualificationId" required="">
+                            </select>
+                            <div class="invalid-feedback">
+                                Пожалуйста, выберите валидную квалификацию
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="state" class="form-label">Ранг</label>
+                            <select class="form-select" id="Rank" name="RankId" required="">
+                            </select>
+                            <div class="invalid-feedback">
+                                Пожалуйста, выберите валидный ранг
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-end mt-3 me-1">
+                        <a asp-controller="Employees" asp-action="Index" class="col-2 btn btn-secondary" role="button">
+                            Отмена
+                        </a>
+
+                        <button class="col-2 btn btn-primary ms-3" type="submit">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    $(document).ready(function () {
+        $("#PhotoFile").on("change", () => {
+            var name = document.getElementById("PhotoFile").files[0].name;
+            $("#Photo").val(name);
+        })
+
+        $("#StartTime").prop("selectedIndex", 9).change();
+        $("#EndTime").prop("selectedIndex", 18).change();
+
+        $.ajax({
+            type: "Get",
+            url: "/Qualifications/GetJson?positionId=" + $("#Position").val(),
+            success: function (data) {
+                var qualifications = JSON.parse(data).qualifications;
+
+                $("#Qualification").empty();
+                $.each(qualifications, function (key, value) {
+                    $("#Qualification").append($("<option></option>").attr("value", value).text(key));
+                });
+            }
+        });
+
+        $.ajax({
+            type: "Get",
+            url: "/Ranks/GetJson?positionId=" + $("#Position").val(),
+            success: function (data) {
+                var ranks = JSON.parse(data).ranks;
+
+                $("#Rank").empty();
+                $.each(ranks, function (key, value) {
+                    $("#Rank").append($("<option></option>").attr("value", value).text(key));
+                });
+            }
+        });
+    });
+</script>

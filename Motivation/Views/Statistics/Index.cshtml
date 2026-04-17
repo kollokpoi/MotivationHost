@@ -1,0 +1,68 @@
+﻿@model StatisticsViewModel
+@{
+    ViewData["Title"] = "Статистика";
+}
+
+<div class="pagetitle">
+    <h1>Статистика</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Компания</a></li>
+            <li class="breadcrumb-item active">Статистика</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section dashboard">
+    <div class="row">
+        <div class="col-xxl-4 col-md-6">
+            <a class="card info-card sales-card" asp-controller="Employees" asp-action="Index">
+                <div class="card-body">
+                    <h5 class="card-title">Сотрудников</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>@Model.WorkersCount</h6>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-xxl-4 col-md-6">
+            <div class="card info-card revenue-card">
+                <div class="card-body">
+                    <h5 class="card-title">Бюджет</h5>
+                    @* <h5 class="card-title">Бюджет <span>| В этом месяце</span></h5> *@
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="bi bi-currency-dollar"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>@Model.Budget.ToString("C")</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xxl-4 col-xl-12">
+            <a class="card info-card customers-card" asp-controller="EmployeePenalties" asp-action="Index"
+                asp-route-year="@DateTime.Now.Year" asp-route-month="@DateTime.Now.Month">
+                <div class="card-body">
+                    <h5 class="card-title">Замечаний <span>| В этом месяце</span></h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="bi bi-exclamation-diamond"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>@Model?.MonthPenaltiesCount</h6>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>

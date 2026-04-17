@@ -1,0 +1,53 @@
+networks:
+  motivation-dev:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+
+services:
+
+  app:
+    container_name: Motivation
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:443"
+    networks:
+      motivation-dev:
+        ipv4_address: 172.18.0.3
+    volumes:
+      - /home/.aspnet/https:/https:ro
+      - app-images:/app/wwwroot/images
+    depends_on:
+      - postgres_db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=https://+:443
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - TZ=Asia/Yekaterinburg
+    restart: always
+
+  postgres_db:
+    container_name: postgres
+    image: postgres:16.1
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGPORT=${POSTGRES_PORT}
+      - TZ=Asia/Yekaterinburg
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    networks:
+      motivation-dev:
+        ipv4_address: 172.18.0.2
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  postgres-data:
+  app-images:

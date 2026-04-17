@@ -1,0 +1,152 @@
+﻿@model EmployeesViewModel
+@{
+    ViewData["Title"] = "Сотрудники";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>Настройка сотрудников</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Настройки</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="col-md-auto col-sm-12 pe-0 hidden-mobile">
+            <a asp-controller="Employees" asp-action="Add" class="btn btn-primary" role="button">
+                <i class="bi bi-plus-lg me-2"></i>Добавить
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body" style="padding-top: 20px">
+                <table class="table table-fixed align-middle">
+                    <thead>
+                        <tr>
+                            <th class="col table-column-header" scope="col">Сотрудник</th>                            
+                           
+                            <th class="col table-column-header" scope="col">Рабочий график</th>
+                            <th class="col table-column-header" scope="col">Зарплата</th>
+                            <th class="col table-column-header text-center" scope="col">Подразделение</th>
+                            <th class="col table-column-header text-center" scope="col">Должность</th>
+                            <th class="col table-column-header text-center" scope="col">Квалификация</th>
+                            <th class="col table-column-header text-center" scope="col">Ранг</th>
+                            <th class="col table-column-header text-center" scope="col">Статус</th>
+                            <th сlass="col table-column-header text-center" scope="col"> </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (!Model.Employees.Any())
+                        {
+                            <tr class="table-row empty-table-identificator">
+                                <td> Тут пока никого нет</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        }
+
+                        @foreach (var vm in Model.Employees)
+                        {
+                            var employee = vm.Employee;
+                            if (employee == null) continue;
+                            <tr>
+                                <td class="col-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-4">
+                                            <img src="@(string.IsNullOrEmpty(employee.Photo) ? "~/images/profile.png" : employee.Photo)" alt="Profile" class="rounded-circle" width="50" height="50">
+                                        </div>
+                                        <div class="col-8">
+                                            @employee.GetShortName()<br><span style="font-size: 14px; color: #888888">@employee.Email</span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div>
+                                        @employee.StartTime.ToLocalTime().ToString("HH:mm") - @employee.EndTime.ToLocalTime().ToString("HH:mm")<br>
+                                        <span style="font-size: 14px; color: #888888">@(employee.EndTime.Hour - employee.StartTime.Hour) часов</span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div>
+                                        @vm.Salary.ToString("C")<br><span style="font-size: 14px; color: #888888">@vm.SalaryPerHour.ToString("C")/час</span>
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    @employee.Department?.Name
+                                </td>
+
+                                <td class="text-center">
+                                    @employee.Position?.Name
+                                </td>
+
+                                <td class="text-center">
+                                    @employee.Qualification?.Name
+                                </td>
+
+                                <td class="text-center">
+                                    @employee.Rank?.Number
+                                </td>
+
+                                <td class="text-center">
+                                    <div class="status-text">
+                                        @{
+                                            var textStatus = "";
+                                            var colorStatus = "";
+                                            switch (employee.Status)
+                                            {
+                                                case EmployeeStatus.AtWork:
+                                                    textStatus = "Присутствует";
+                                                    colorStatus = "#AAFFAA";
+                                                    break;
+                                                case EmployeeStatus.Abscent:
+                                                    textStatus = "Отсутствует";
+                                                    colorStatus = "#FFAAAA";
+                                                    break;
+                                                case EmployeeStatus.AtBreak:
+                                                    textStatus = "На перерыве";
+                                                    colorStatus = "#FFFFAA";
+                                                    break;
+                                                case EmployeeStatus.WorkComplete:
+                                                    textStatus = "Закончил";
+                                                    colorStatus = "#DF4228";
+                                                    break;
+                                            }
+                                        }
+                                        <div class="status-icon" style="background-color: @colorStatus"> </div>
+                                        <div>
+                                            @textStatus
+                                        </div>
+                                    </div>
+                                </td>
+
+
+                                <td class="text-center">
+                                    <a asp-controller="Employees" asp-action="Edit" asp-route-id="@employee.Id" class="btn btn-secondary" role="button">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

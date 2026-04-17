@@ -1,0 +1,82 @@
+﻿@model AddDepartmentViewModel
+
+@{
+    ViewData["Title"] = "Добавление подразделения";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>@ViewData["Title"]</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Настройки</li>
+                        <li class="breadcrumb-item">Подразделение</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body" style="padding-top: 20px">
+                <div class="row">
+                    <div class="col">
+                        <form asp-controller="Departments" asp-action="Add" class="needs-validation" novalidate="">
+                            <div class="row g-3">
+                                <div class="col-sm-12">
+                                    <label for="departmentName" class="form-label">Название</label>
+                                    <input type="text" class="form-control" id="departmentName" name="Department.Name" placeholder="" value="" required="">
+                                    <div class="invalid-feedback">
+                                        Необходима валидное название
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <label for="departmentBudget" class="form-label">Бюджет</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₽</span>
+                                        <input type="number" class="form-control" id="departmentBudget" name="Department.Budget" min="0" placeholder="" value="" required="">
+                                        <div class="invalid-feedback">
+                                            Необходим валидный бюджет
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            @if (Model.Departments.Any())
+                            {
+                                <label class="form-label mt-2">Головное подразделение</label>
+                                <div class="row row-cols-auto g-3 justify-content-start">
+                                    @for (int i = 0; i < Model.Departments.Count; i++)
+                                    {
+                                        var department = Model.Departments[i];
+
+                                        <div class="col">
+                                            <input type="radio" class="check-department btn-check" id="btn-check-outlined-@department.Id" value="@department.Id" name="Department.ParentId">
+                                            <label class="btn btn-outline-primary" for="btn-check-outlined-@department.Id">@department.Name</label>
+                                        </div>
+                                    }
+                                </div>
+                            }
+
+                            <hr class="my-4">
+
+                            <div class="row justify-content-end">
+                                <a asp-controller="Departments" asp-action="Index" class="col-2 btn btn-secondary" role="button">
+                                    Отмена
+                                </a>
+
+                                <button class="col-2 btn btn-primary mx-2" type="submit">Добавить</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

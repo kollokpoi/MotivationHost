@@ -1,0 +1,47 @@
+﻿@model RanksViewModel
+
+<table id="rank-table" class="table table-hover table-fixed table-striped align-middle">
+    <thead>
+        <tr>
+            <th class="table-column-header col-2" data-sortable="true">
+                <span>Номер ранга</span>
+            </th>
+            <th class="table-column-header col-8" data-sortable="true">Надбавка ₽/час</th>
+            <th class="table-column-header text-center col-2" data-sortable="true">
+                <i class="bi bi-calendar me-2"></i>Дата изменения
+            </th>
+        </tr>
+    </thead>
+
+    <tbody id="table-body">
+        @if (!Model.Ranks.Any())
+        {
+            <tr class="table-row empty-table-identificator">
+                <td>
+                    Тут пока ничего нет
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        }
+
+        @foreach (var rank in Model.Ranks)
+        {
+            <tr class="table-row">
+                <td class="col-2 ps-3">
+                    @rank.Number
+                </td>
+
+                <td class="col-8 ps-3">
+                    <a href="#" data-pk="@rank.Id" data-type="text" class="salary-bonus-edit editable-disabled editable-click">
+                        @rank.SalaryBonus
+                    </a>
+                </td>
+
+                <td class="text-center col-2 update-column">
+                    @rank.Updated.ToLocalTime()
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

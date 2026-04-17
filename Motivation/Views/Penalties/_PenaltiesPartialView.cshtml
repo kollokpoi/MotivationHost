@@ -1,0 +1,37 @@
+﻿@model PenaltiesViewModel
+
+@{
+    <tr class="table-row empty-table-identificator" @(Model.Penalties.Any() ? "style=display:none;" : "")>
+        <td class="col-7">Тут пока ничего нет</td>
+        <td class="col-3"></td>
+        <td class="col-2"></td>
+        <td style="min-width: 55px;"></td>
+    </tr>
+
+    foreach (var penalty in Model.Penalties)
+    {
+        <tr class="table-row">
+            <td class="col-7 ps-3">
+                <a href="#" data-pk="@penalty.Id" data-position-id="@penalty.PositionId" data-type="text" class="description-edit editable-disabled editable-click">
+                    @penalty.Description
+                </a>
+            </td>
+
+            <td class="col-3 ps-3">
+                <a href="#" data-pk="@penalty.Id" data-position-id="@penalty.PositionId" data-type="text" class="points-edit editable-disabled editable-click">
+                    @penalty.Points
+                </a>
+            </td>
+
+            <td class="col-2 text-center update-column">
+                @penalty.Updated.ToLocalTime()
+            </td>
+
+            <td style="min-width: 55px;" class="hidden-mobile">
+                <button data-id="@penalty.Id" data-value="@penalty.Id" class="btn btn-danger collapse p-0 delete-button">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </td>
+        </tr>
+    }
+}

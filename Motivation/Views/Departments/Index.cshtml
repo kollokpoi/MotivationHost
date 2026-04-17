@@ -1,0 +1,41 @@
+﻿@model DepartmentsViewModel
+@{
+    ViewData["Title"] = "Подразделения";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>Настройка подразделений</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Настройки</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="col-md-auto col-sm-12 pe-0 hidden-mobile">
+            <a asp-controller="Departments" asp-action="Add" class="btn btn-primary" role="button">
+                <i class="bi bi-plus-lg me-2"></i>Добавить
+            </a>
+        </div>
+    </div>
+
+    <div class="row pt-4 pb-2 row-cols-sm-1 align-items-center">
+        <div class="container-fluid content-row">
+            @if (!Model.Departments.Any())
+            {
+                <p>Тут пока ничего нет</p>
+            }
+            <div class="row">
+                @foreach (var department in Model.Departments)
+                {
+                    <partial name="Department.cshtml" model="@department" />
+                }
+            </div>
+        </div>
+    </div>
+</div>

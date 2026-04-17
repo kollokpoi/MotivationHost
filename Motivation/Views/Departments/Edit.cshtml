@@ -1,0 +1,135 @@
+﻿@model EditDepartmentViewModel
+@{
+    ViewData["Title"] = "Редактирование подразделения";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>@ViewData["Title"]</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Настройки</li>
+                        <li class="breadcrumb-item">Подразделения</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body" style="padding-top: 20px">
+                <div class="row">
+                    <div class="col">
+                        <form asp-controller="Departments" asp-action="Edit" class="needs-validation" novalidate="">
+                            <input type="hidden" value="@Model.Department?.Id" name="Department.Id" />
+                            <div class="row g-3">
+                                <div class="col-sm-12">
+                                    <label for="departmentName" class="form-label">Название</label>
+                                    <input type="text" class="form-control" id="departmentName" name="Department.Name" placeholder="" value="@Model.Department?.Name" required="">
+                                    <div class="invalid-feedback">
+                                        Необходима валидное название
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <label for="departmentBudget" class="form-label">Бюджет</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₽</span>
+                                        <input type="number" class="form-control" id="departmentBudget" name="Department.Budget" min="0" step="0.01" placeholder="" value="@Model.Department?.Budget.ToString()" required="">
+                                        <div class="invalid-feedback">
+                                            Необходим валидный бюджет
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label for="country" class="form-label">Менеджер</label>
+                                    <select class="form-select" id="departmentManager" name="Department.ManagerId" required="">
+                                        @foreach (var employee in Model.Employees)
+                                        {
+                                            if (employee.DepartmentId == Model.Department?.Id && employee.IsManager)
+                                            {
+                                                <option selected value="@employee.Id">@employee.GetFullName()</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@employee.Id">@employee.GetFullName()</option>
+                                            }
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Пожалуйста, выберите валидного менеджера
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (Model.Departments.Any())
+                            {
+                                <label class="form-label mt-2">Головное подразделение</label>
+                                <div class="row row-cols-auto g-3 justify-content-start">
+                                    @for (int i = 0; i < Model.Departments.Count; i++)
+                                    {
+                                        var department = Model.Departments[i];
+
+                                        <div class="col">
+                                            <input type="radio" class="check-department btn-check" id="btn-check-outlined-@department.Id" value="@department.Id" name="Department.ParentId" @(department.Id == Model.Department?.ParentId ? "checked" : "")>
+                                            <label class="btn btn-outline-primary" for="btn-check-outlined-@department.Id">@department.Name</label>
+                                        </div>
+                                    }
+                                </div>
+                            }
+
+                            <hr class="my-4">
+
+                            <div class="row justify-content-end">
+                                <button data-id="@Model.Department?.Id" data-value="@Model.Department?.Name" id="deleteDepartment" class="col-2 btn btn-danger me-2">
+                                    Удалить
+                                </button>
+
+                                <a asp-controller="Departments" asp-action="Index" class="col-2 btn btn-secondary" role="button">
+                                    Отмена
+                                </a>
+
+                                <button class="col-2 btn btn-primary mx-2" type="submit">Обновить</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    $(document).ready(function () {
+        $('#deleteDepartment').on('click', function (e) {
+            e.preventDefault();
+            $('#delete-modal-title').text('Вы действительно хотите удалить это подразделение?')
+            $('#confirm-delete-modal').modal('show');
+        })
+
+        $('#confirm-delete-button').on("click", function () {
+            var id = $('#deleteDepartment').data('id');
+            console.log(id);
+            $.ajax({
+                url: '/Departments/Delete',
+                type: 'DELETE',
+                contentType: 'application/json',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                success: function (result) {
+                    window.location.href = '@Url.Action("Index", "Departments")'
+                },
+                error: handleError,
+                data: JSON.stringify({
+                    Id: id
+                })
+            });
+        })
+    });
+</script>

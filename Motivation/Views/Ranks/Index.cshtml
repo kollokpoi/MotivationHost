@@ -1,0 +1,70 @@
+﻿@model RanksViewModel
+@{
+    ViewData["Title"] = "Ранги";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>Настройка рангов сотрудников</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Настройки</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body">
+                <div class="row justify-content-md-end pt-4 pb-2">
+                    <div class="col-xxl-2 col-md-3">
+                        <select id="position-select" class="select-position form-select selectpicker" @(!Model.Positions.Any() ? "disabled" : "")>
+                            @foreach (var position in Model.Positions)
+                            {
+                                <option value="@position.Id">@position.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-xxl-2 col-md-3 hidden-mobile">
+                        <button id="enable-edit-btn" type="button" class="btn btn-secondary w-100" @(!Model.Positions.Any() ? "disabled" : "")>
+                            <i class="bi bi-pencil me-2"></i>Редактировать
+                        </button>
+                    </div>
+                </div>
+
+                <div id="partial-rank-view">
+                    <partial name="_RanksPartialView.cshtml" model="@Model" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    $(document).ready(() => {
+        makeEditableNumber(".salary-bonus-edit", "SalaryBonus", '/Ranks/Update');
+    });
+
+    $('#enable-edit-btn').click(toggleEdit);
+
+    $("#position-select").on("change", () => {
+        $.ajax({
+            type: "Get",
+            url: "/Ranks/Get?positionId=" + $('#position-select').val(),
+            success: function (data) {
+                $("#partial-rank-view").html("");
+                $("#partial-rank-view").html(data);
+
+                makeEditableNumber(".salary-bonus-edit", "SalaryBonus", '/Ranks/Update');
+
+                disableEdit();
+            }
+        });
+    });
+</script>

@@ -1,0 +1,67 @@
+﻿@model AddEmployeePenaltyViewModel
+
+@{
+    ViewData["Title"] = "Добавление замечания";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>@ViewData["Title"]</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Компания</li>
+                        <li class="breadcrumb-item">Замечания</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body card-body pt-4 col-md-4">
+                <div>
+                    <form asp-controller="EmployeePenalties" asp-action="Add" class="needs-validation" novalidate enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="Penalty" class="form-label">Штраф</label>
+                            <select class="form-select" id="Penalty" name="PenaltyId" required>
+                                <option value="" selected disabled>Выберите штраф</option>
+                                @foreach (var penalty in Model.Penalties)
+                                {
+                                    <option value="@penalty.Id">@penalty.Description</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">Пожалуйста, выберите замечание</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="Employee" class="form-label">Сотрудник</label>
+                            <select class="form-select" id="Employee" name="EmployeeId" required>
+                                <option value="" selected disabled>Выберите сотрудника</option>
+                                @foreach (var employee in Model.Employees)
+                                {
+                                    <option value="@employee.Id">@employee.GetFullName()</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">Пожалуйста, выберите сотрудника</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Explanation" class="form-label">Комментарий</label>
+                            <textarea class="form-control" name="Explanation" id="Explanation" rows="3" required></textarea>
+                            <div class="invalid-feedback">Пожалуйста, введите комментарий</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-center gap-3 mt-4">
+                            <a asp-controller="EmployeePenalties" asp-action="Index" class="btn btn-secondary">Отмена</a>
+                            <button class="btn btn-primary" type="submit">Добавить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

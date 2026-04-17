@@ -1,0 +1,134 @@
+﻿@model PointsOfInterestViewModel
+@{
+    ViewData["Title"] = "Точки интереса";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>Настройка точек интереса</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Настройки</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body">
+                <div class="row justify-content-md-end pt-4 pb-2 hidden-mobile">
+                    <div class="col-md-2 col-sm-12 hidden-mobile">
+                        <button id="enable-edit-btn" type="button" class="btn btn-secondary w-100">
+                            <i class="bi bi-pencil me-2"></i>Редактировать
+                        </button>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-fixed table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th class="table-column-header">Название</th>
+                            <th class="table-column-header">Широта</th>
+                            <th class="table-column-header">Долгота</th>
+                            <th class="table-column-header text-center">
+                                <i class="bi bi-calendar me-2"></i>Дата изменения
+                            </th>
+                            <th class="table-column-header" style="min-width: 55px;"></th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="table-body">
+                        <tr class="table-row empty-table-identificator" @(Model.Points.Any() ? "style=display:none;" : "")>
+                            <td class="col-4">
+                                Тут пока ничего нет
+                            </td>
+                            <td class="col-3"></td>
+                            <td class="col-3"></td>
+                            <td class="col-2"></td>
+                            <td style="min-width: 55px;"></td>
+                        </tr>
+                        
+
+                        @foreach (var position in Model.Points)
+                        {
+                            <tr class="table-row">
+                                <td class="col-4 ps-3">
+                                    <a href="#" data-pk="@position.Id" data-type="text" class="name-edit editable-disabled editable-click">
+                                        @position.Name
+                                    </a>
+                                </td>
+
+                                <td class="col-3 ps-3">
+                                    <a href="#" data-pk="@position.Id" data-type="number" step="any" min="-90" max="90" class="latitude-edit editable-disabled editable-click">
+                                        @position.Latitude.ToString("F5")
+                                    </a>
+                                </td>
+
+                                <td class="col-3 ps-3">
+                                    <a href="#" data-pk="@position.Id" data-type="number" step="any" min="-180" max="180" class="longitude-edit editable-disabled editable-click">
+                                        @position.Longitude.ToString("F5")
+                                    </a>
+                                </td>
+
+                                <td class="col-2 text-center update-column">
+                                    @position.Updated.ToLocalTime()
+                                </td>
+
+                                <td style="min-width: 55px;" class="hidden-mobile">
+                                    <button data-id="@position.Id" data-value="@position.Name" class="btn btn-danger collapse p-0 delete-button">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+
+                        <tr id="add-row" class="collapse table-row">
+                            <form id="add-point-form">
+                                <td class="col-4">
+                                    <input type="text" class="form-control" id="name-input" value="">
+                                </td>
+
+                                <td class="col-3">
+                                    <input type="number" step="any" min="-90" max="90" class="form-control" id="latitude-input" value="">
+                                </td>
+
+                                <td class="col-3">
+                                    <input type="number" step="any" min="-180" max="180" class="form-control" id="longitude-input" value="">
+                                </td>
+
+                                <td class="col-2"></td>
+
+                                <td class="text-center" style="min-width: 55px;">
+                                    <button id="add-position-button" type="submit" class="btn export-button p-0 add-button">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </td>
+                            </form>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    $(document).ready(function () {
+        makeEditableString('.name-edit', 'Name', '/PointsOfInterest/Update');
+        makeEditableString('.latitude-edit', 'Latitude', '/PointsOfInterest/Update');
+        makeEditableString('.longitude-edit', 'Longitude', '/PointsOfInterest/Update');
+        addModalDelete('Вы действительно хотите удалить эту точку?', '/PointsOfInterest/Delete');
+    });
+
+    $('#enable-edit-btn').click(toggleEdit);
+
+    $('#add-point-form').on("submit", (e) => {
+        e.preventDefault();
+        addPointOfInterest();
+    });
+</script>

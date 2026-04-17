@@ -1,0 +1,53 @@
+﻿@model List<Position>
+@{
+    ViewData["Title"] = "Должности";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>Настройка должностей сотрудников</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Настройки</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body">
+                <div class="row justify-content-md-end pt-4 pb-2 hidden-mobile">
+                    <div class="col-md-4 col-sm-12 hidden-mobile">
+                        <button id="enable-edit-btn" type="button" class="btn btn-secondary w-100">
+                            <i class="bi bi-pencil me-2"></i>Редактировать
+                        </button>
+                    </div>
+                </div>
+
+                <div id="partial-positions-view" class="partial-positions-view">
+                    <partial name="_PositionsPartialView.cshtml" model="@Model" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    $(document).ready(function () {
+        makeEditableString('.name-edit', 'Name', '/Positions/Update');
+        makeEditableNumber('.salary-edit', 'Salary', '/Positions/Update');
+        addModalDelete('Вы действительно хотите удалить эту должность и связанные с ней квалификации и ранги?', '/Positions/Delete');
+    });
+
+    $('#enable-edit-btn').click(toggleEdit);
+
+    $('#add-position-form').on("submit", (e) => {
+        e.preventDefault();
+        addPosition();
+    });
+</script>

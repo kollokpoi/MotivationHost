@@ -1,0 +1,81 @@
+﻿@model List<Position>
+
+<table class="table table-hover table-fixed table-striped align-middle">
+    <thead>
+        <tr>
+            <th class="table-column-header">Название</th>
+            <th class="table-column-header">Зарплата ₽/час</th>
+            <th class="table-column-header">Мотивация</th>
+            <th class="table-column-header text-center">
+                <i class="bi bi-calendar me-2"></i>Дата изменения
+            </th>
+            <th class="table-column-header" style="min-width: 55px;"></th>
+        </tr>
+    </thead>
+
+    <tbody id="table-body">
+        @if (!Model.Any())
+        {
+            <tr class="table-row empty-table-identificator">
+                <td> Тут пока ничего нет</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        }
+
+        @foreach (var position in Model)
+        {
+            <tr class="table-row">
+                <td class="col-2 ps-3">
+                    <a href="#" data-pk="@position.Id" data-type="text" class="name-edit editable-disabled editable-click">
+                        @position.Name
+                    </a>
+                </td>
+
+                <td class="col-5 ps-3">
+                    <a href="#" data-pk="@position.Id" data-type="text" class="salary-edit editable-disabled editable-click">
+                        @position.Salary
+                    </a>
+                </td>
+
+                <td class="col-4 text-center update-column">
+                    <a asp-controller="Bonus" asp-action="List" asp-route-positionId="@position.Id" class="btn btn-secondary w-100">
+                        <i class="bi bi-pencil me-2"></i>Изменить
+                    </a>
+                </td>
+
+                <td class="col-3 text-center update-column">
+                    @position.Updated.ToLocalTime()
+                </td>
+
+
+                <td style="min-width: 55px;" class="hidden-mobile">
+                    <button data-id="@position.Id" data-value="@position.Name" class="btn btn-danger collapse p-0 delete-button">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+
+        <tr id="add-row" class="collapse table-row">
+            <form id="add-position-form">
+            <td>
+                <input type="text" class="form-control" id="name-input" value="">
+            </td>
+
+            <td>
+                <input type="text" class="form-control" id="salary-input" value="">
+            </td>
+
+            <td class="col-2"></td>
+
+            <td class="text-center" style="min-width: 55px;">
+                <button id="add-position-button" type="submit" class="btn export-button p-0 add-button">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </td>
+            </form>
+        </tr>
+    </tbody>
+</table>

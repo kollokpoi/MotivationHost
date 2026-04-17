@@ -1,0 +1,100 @@
+﻿@model QualificationsViewModel
+@{
+    ViewData["Title"] = "Квалификации";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>Настройка квалификаций</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Настройки</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body">
+                <div class="row justify-content-md-end pt-4 pb-2 hidden-mobile">
+                    <div class="col-xxl-2 col-md-3">
+                        <select id="position-select" class="select-position form-select selectpicker" @(!Model.Positions.Any() ? "disabled" : "")>
+                            @foreach (var position in Model.Positions)
+                            {
+                                <option value="@position.Id">@position.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-xxl-2 col-md-3">
+                        <button id="enable-edit-btn" type="button" class="btn btn-secondary w-100" @(!Model.Positions.Any() ? "disabled" : "")>
+                            <i class="bi bi-pencil me-2"></i>Редактировать
+                        </button>
+                    </div>
+                </div>
+
+
+                <table class="table table-hover table-fixed table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th class="col-3 table-column-header">Название</th>
+                            <th class="col-7 table-column-header">Оценка уровня</th>
+                            <th class="col-2 table-column-header text-center">
+                                <i class="bi bi-calendar me-2"></i>Дата изменения
+                            </th>
+                            <th class="table-column-header" style="min-width: 55px;"></th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="table-body">
+                        <partial name="_QualificationsPartialView.cshtml" model="@Model" />
+
+                        <tr id="add-row" class="collapse">
+                            <form id="add-qualification-form">
+                                <td class="col-3">
+                                    <input type="text" class="form-control" id="name-input" value="">
+                                </td>
+
+                                <td class="col-7">
+                                    <input type="text" class="form-control" id="points-input" value="">
+                                </td>
+
+                                <td class="col-2"></td>
+
+                                <td class="text-center" style="min-width: 55px;">
+                                    <button type="submit" class="btn export-button p-0 add-button">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </td>
+                            </form>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    $(document).ready(() => {
+        makeEditableString(".name-edit", "Name", '/Qualifications/Update');
+        makeEditableNumber(".points-edit", "Points", '/Qualifications/Update');
+        addModalDelete('Вы действительно хотите удалить данную квалификацию?', '/Qualifications/Delete');
+    });
+
+    $('#add-qualification-form').on("submit", (e) => {
+        e.preventDefault();
+        addQualification();
+    });
+
+    $("#position-select").on("change", () => {
+        changePositionInQualifications();
+    });
+
+    $('#enable-edit-btn').click(toggleEdit);
+</script>

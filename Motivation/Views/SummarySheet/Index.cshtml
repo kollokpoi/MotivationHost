@@ -1,0 +1,166 @@
+@model SummarySheetViewModel
+@{
+    ViewData["Title"] = "Сводный лист";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>@ViewData["Title"]</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Компания</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="col-md-auto col-sm-12 pe-0 hidden-mobile">
+            <a asp-controller="SummarySheet" asp-action="Export" asp-route-year="@Model.StartDate.Year" asp-route-month="@Model.StartDate.Month" class="btn btn-primary" role="button">
+                <i class="bi bi-cloud-arrow-up me-2"></i>Экспортировать
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body">
+                <div class="date-info">
+                    <a class="me-2" asp-controller="SummarySheet" asp-action="Index" asp-route-year="@Model.StartDate.AddMonths(-1).Year" asp-route-month="@Model.StartDate.AddMonths(-1).Month">
+                        <i class="bi bi-chevron-left switch-date-button"></i>
+                    </a>
+
+                    <h5 class="card-title">@Model.StartDate.ToString("d") - @Model.EndDate.ToString("d")</h5>
+
+                    @if (Model.EndDate < DateTime.Now)
+                    {
+                        <a class="ms-2" asp-controller="SummarySheet" asp-action="Index" asp-route-year="@Model.StartDate.AddMonths(1).Year" asp-route-month="@Model.StartDate.AddMonths(1).Month">
+                            <i class="bi bi-chevron-right switch-date-button"></i>
+                        </a>
+                    }
+                </div>
+
+                <section class="section dashboard">
+                    <table class="table table-bordered table-responsive align-middle" style="font-size: 12px">
+                        <thead>
+                            <tr>
+                                <th style="vertical-align: middle;" class="text-center">
+                                    Сотрудник
+                                </th>
+
+                                <th style="vertical-align: middle;" class="text-center">
+                                    Эффективность
+                                </th>
+
+                                <th style="vertical-align: middle;" class="text-center">
+                                    Итоговая оценка
+                                </th>
+
+                                <th style="vertical-align: middle;" class="text-center">
+                                    Базовая оценка
+                                </th>
+
+                                <th style="vertical-align: middle;" class="text-center">
+                                   Оценка нарушений
+                                </th>
+
+                                <th style="vertical-align: middle;" class="text-center">
+                                    Квалификация
+                                </th>
+
+                                <th style="vertical-align: middle;" class="text-center">
+                                    Очки квалификации
+                                </th>
+                                <th style="vertical-align: middle;" class="text-center">
+                                    Кол-во смен
+                                </th>
+                                <th style="vertical-align: middle;" class="text-center">
+                                    Отработанное время
+                                </th>
+                                <th style="vertical-align: middle;" class="text-center">
+                                    Новый ранг
+                                </th>
+                                <th style="vertical-align: middle;" class="text-center">
+                                    Предыдущий ранг
+                                </th>
+                                <th style="vertical-align: middle;" class="text-center">
+                                    Расчётный ранг
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (!Model.ScoreSheets.Any())
+                            {
+                                <tr>
+                                    <td>Тут пока никого нет</td>
+                                    <td></td>
+                                </tr>
+                            }
+
+                            @foreach (var scoreSheet in Model.ScoreSheets)
+                            {
+                                var employee = scoreSheet.Employee;
+                                <tr>
+                                    <td style="vertical-align: middle;" width="15%">
+                                        <div class="row align-items-center">
+                                            <div class="col-8">
+                                                @employee.GetShortName()
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td class="text-center">
+                                        @scoreSheet.Efficiency
+                                    </td>
+
+                                    <td class="text-center">
+                                        @scoreSheet.Score
+                                    </td>
+
+                                    <td class="text-center">
+                                        @Model.BasePoints
+                                    </td>
+
+                                    <td class="text-center">
+                                        @scoreSheet.PenaltyPoints
+                                    </td>
+
+                                    <td class="text-center">
+                                        @scoreSheet.Qualification.Name
+                                    </td>
+
+                                    <td class="text-center">
+                                        @scoreSheet.Qualification.Points
+                                    </td>
+
+                                    <td class="text-center">
+                                        @scoreSheet.ShiftsCount
+                                    </td>
+
+                                    <td class="text-center">
+                                        @scoreSheet.WorkingTime
+                                    </td>
+
+                                    <td class="text-center">
+                                        @scoreSheet.NewRank.Number
+                                    </td>
+
+                                    <td class="text-center">
+                                        @scoreSheet.Rank.Number
+                                    </td>
+
+                                    <td class="text-center">
+                                        @scoreSheet.CalculatedRank.Number
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

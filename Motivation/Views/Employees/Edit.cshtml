@@ -1,0 +1,242 @@
+﻿@model EditEmployeeViewModel
+
+@{
+ViewData["Title"] = "Редактирование сотрудника";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>@ViewData["Title"]</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Настройки</li>
+                        <li class="breadcrumb-item">Сотрудники</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body" style="padding-top: 20px">
+                <div class="row">
+                    <div class="col">
+                        <form asp-controller="Employees" asp-action="Edit" class="needs-validation" novalidate=""
+                            enctype="multipart/form-data">
+                            <div class="row g-3">
+                                <div class="col-sm-4">
+                                    <label for="LastName" class="form-label">Фамилия</label>
+                                    <input type="text" class="form-control" id="LastName" name="LastName" placeholder=""
+                                        value="@Model.Employee?.LastName" required="">
+                                    <div class="invalid-feedback">
+                                        Необходима валидная фамилия
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <label for="FirstName" class="form-label">Имя</label>
+                                    <input type="text" class="form-control" id="FirstName" name="FirstName"
+                                        placeholder="" value="@Model.Employee?.FirstName" required="">
+                                    <div class="invalid-feedback">
+                                        Необходимо валидное имя
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <label for="MiddleName" class="form-label">Отчество</label>
+                                    <input type="text" class="form-control" id="MiddleName" name="MiddleName"
+                                        placeholder="" value="@Model.Employee?.MiddleName" required="">
+                                    <div class="invalid-feedback">
+                                        Необходима валидное отчество
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="Email" class="form-label">Email</label>
+                                    <div class="input-group has-validation">
+                                        <span class="input-group-text">@@</span>
+                                        <input type="email" class="form-control" id="Email" name="Email"
+                                            placeholder="Email" value="@Model.Employee?.Email" required="">
+                                        <div class="invalid-feedback">
+                                            Необходим валидный Email
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="Password" class="form-label">Пароль</label>
+                                    <input type="password" class="form-control" id="Password" name="Password"
+                                        placeholder="" value="">
+                                    <div class="invalid-feedback">
+                                        Необходим валидный пароль
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="Photo" class="form-label">Фото</label>
+                                    <div class="input-group">
+                                        <input type="text" value="@Model.Employee?.Photo" name="Photo" id="Photo"
+                                            class="form-control">
+                                        <label for="PhotoFile" class="btn btn-outline-secondary">...</label>
+                                        <input type="file" name="PhotoFile" hidden id="PhotoFile">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="StartTime" class="form-label">Начало работы</label>
+                                    <select class="form-select" id="StartTime" name="StartTime" required="">
+                                        @{
+                                            var startDate = new DateTime(1, 1, 1);
+                                            var endDate = new DateTime(1, 1, 2);
+                                            @for (var date = startDate; date < endDate; date=date.AddHours(1)) {
+                                                <!option
+                                                    @(date==@Model.Employee?.StartTime.ToLocalTime() ? "selected" : "" )
+                                                    value="@date"
+                                                >@date.ToString("HH:mm")</!option>
+                                            }
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Пожалуйста, выберите валидное начало работы
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="EndTime" class="form-label">Конец работы</label>
+                                    <select class="form-select" id="EndTime" name="EndTime" required="">
+                                        @for (var date = startDate; date < endDate; date=date.AddHours(1)) {
+                                            <!option
+                                                @(date==@Model.Employee?.EndTime.ToLocalTime() ? "selected" : "" )
+                                                value="@date"
+                                            >@date.ToString("HH:mm")</!option>
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Пожалуйста, выберите валидный конец работы
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="Department" class="form-label">Подразделение</label>
+                                    <select class="form-select" id="Department" name="DepartmentId" required="">
+                                        @foreach (var department in Model.Departments)
+                                        {
+                                        <!option @(department.Id==@Model.Employee?.DepartmentId ? "selected" : "" )
+                                            value="@department.Id" value="@department.Id">@department.Name</!option>
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Пожалуйста, выберите валидное подразделение
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="Position" class="form-label">Должность</label>
+                                    <select class="form-select" id="Position" name="PositionId" required="">
+                                        @foreach (var position in Model.Positions)
+                                        {
+                                        <!option @(position.Id==@Model.Employee?.PositionId ? "selected" : "" )
+                                            value="@position.Id">@position.Name</!option>
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Пожалуйста, выберите валидную должность
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="Qualification" class="form-label">Квалификация</label>
+                                    <select class="form-select" id="Qualification" name="QualificationId" required="">
+                                        @foreach (var qualification in Model.Qualifications)
+                                        {
+                                        <!option @(qualification.Id==@Model.Employee?.QualificationId ? "selected" : ""
+                                            ) value="@qualification.Id">@qualification.Name</!option>
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Пожалуйста, выберите валидную квалификацию
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="Rank" class="form-label">Ранг</label>
+                                    <select class="form-select" id="Rank" name="RankId" required="">
+                                        @foreach (var rank in Model.Ranks)
+                                        {
+                                        <!option @(rank.Id==@Model.Employee?.RankId ? "selected" : "" )
+                                            value="@rank.Id">@rank.Number</!option>
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Пожалуйста, выберите валидный ранг
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <input type="hidden" value="@Model.Employee?.IsManager.ToString().ToLower()" id="IsManager"
+                                name="IsManager">
+                            <input type="hidden" value="@Model.Employee?.UserId" id="UserId" name="UserId">
+                            <input type="hidden" value="@Model.Employee?.Status" id="Status" name="Status">
+                            <input type="hidden" value="@Model.Employee?.BitrixUserId" id="BitrixUserId" name="BitrixUserId">
+
+                            <div class="row justify-content-end">
+                                <button data-id="@Model.Employee?.Id" id="deleteEmployee" class="col-2 btn btn-danger me-2">
+                                    Удалить
+                                </button>
+
+                                <a asp-controller="Employees" asp-action="Index" class="col-2 btn btn-secondary"
+                                    role="button">
+                                    Отмена
+                                </a>
+
+                                <button class="col-2 btn btn-primary mx-2" type="submit">Обновить</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    $(document).ready(function () {
+        $('#deleteEmployee').on('click', function (e) {
+            e.preventDefault();
+            $('#delete-modal-title').text('Вы действительно хотите удалить этого сотрудника?')
+            $('#confirm-delete-modal').modal('show');
+        })
+
+
+        $("#PhotoFile").on("change", () => {
+            var name = document.getElementById("PhotoFile").files[0].name;
+            $("#Photo").val(name);
+        })
+
+        $('#confirm-delete-button').on("click", function () {
+            var id = $('#deleteEmployee').data('id');
+            console.log(id);
+            $.ajax({
+                url: '/Employees/Delete',
+                type: 'DELETE',
+                contentType: 'application/json',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                success: function (result) {
+                    window.location.href = '@Url.Action("Index", "Employees")'
+                },
+                error: handleError,
+                data: JSON.stringify({
+                    Id: id
+                })
+            });
+        })
+    });
+</script>

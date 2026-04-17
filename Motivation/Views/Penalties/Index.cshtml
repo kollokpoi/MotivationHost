@@ -1,0 +1,121 @@
+﻿@model PenaltiesViewModel
+@{
+    ViewData["Title"] = "Штрафы";
+}
+
+<div class="container-fluid">
+    <div class="row px-0">
+        <div class="col-auto me-auto ps-0">
+            <div class="pagetitle">
+                <h1>Настройка штрафов</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Настройки</li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-full">
+            <div class="card-body">
+                <div class="row justify-content-md-end pt-4 pb-2">
+                    <div class="col-xxl-2 col-md-3">
+                        <select id="position-select" class="select-position form-select selectpicker" @(!Model.Positions.Any() ? "disabled" : "")>
+                            @foreach (var position in Model.Positions)
+                            {
+                                <option value="@position.Id">@position.Name</option>
+                            }
+                        </select>
+                    </div>
+                        <div class="col-md-3">
+                            <label for="state" class="form-label">Ранг</label>
+                            <select class="form-select" id="Rank" name="RankId" required="">
+                            </select>
+                            <div class="invalid-feedback">
+                                Пожалуйста, выберите валидный ранг
+                            </div>
+                        </div>
+
+                    <div class="col-xxl-2 col-md-3 hidden-mobile">
+                        <button id="enable-edit-btn" type="button" class="btn btn-secondary w-100" @(!Model.Positions.Any() ? "disabled" : "")>
+                            <i class="bi bi-pencil me-2"></i>Редактировать
+                        </button>
+                    </div>
+                </div>
+
+
+                <table class="table table-hover table-fixed table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th class="col-7 table-column-header">Описание</th>
+                            <th class="col-3 table-column-header">Штрафные баллы</th>
+                            <th class="col-2 table-column-header text-center">
+                                <i class="bi bi-calendar me-2"></i>Дата изменения
+                            </th>
+                            <th class="table-column-header" style="min-width: 55px;"></th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="table-body">
+                        <partial name="_PenaltiesPartialView.cshtml" model="@Model" />
+
+                        <tr id="add-row" class="collapse">
+                            <form id="add-penalty-form">
+                                <td class="col-7">
+                                    <input type="text" class="form-control" id="description-input" value="">
+                                </td>
+
+                                <td class="col-3">
+                                    <input type="text" class="form-control" id="points-input" value="">
+                                </td>
+
+                                <td class="col-2"></td>
+
+                                <td class="text-center" style="min-width: 55px;">
+                                    <button type="submit" class="btn export-button p-0 add-button">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </td>
+                            </form>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    $(document).ready(() => {
+        makeEditableString(".description-edit", "Description", '/Penalties/Update');
+        makeEditableNumber(".points-edit", "Points", '/Penalties/Update');
+        addModalDelete('Вы действительно хотите удалить данный штраф?', '/Penalties/Delete');
+    });
+
+    $('#add-penalty-form').on("submit", (e) => {
+        e.preventDefault();
+        addPenalty();
+    });
+
+    $("#position-select").on("change", () => {
+        $.ajax({
+            type: "Get",
+            url: "/Penalties/Get?positionId=" + $("#position-select").val(),
+            success: function (data) {
+                $("#table-body>.table-row").remove();
+                $(data).insertBefore('#table-body>#add-row');
+
+                makeEditableString(".description-edit", "Description", '/Penalties/Update');
+                makeEditableNumber(".points-edit", "Points", '/Penalties/Update');
+                addModalDelete('Вы действительно хотите удалить данный штраф?', '/Penalties/Delete');
+
+                disableEdit();
+            }
+        });
+    });
+
+    $('#enable-edit-btn').click(toggleEdit);
+</script>

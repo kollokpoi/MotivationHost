@@ -1,0 +1,128 @@
+﻿@model List<Employee>
+@{
+    ViewData["Title"] = "Заработная плата";
+}
+
+<div class="px-0">
+    <div class="col-auto me-auto ps-0">
+        <div class="pagetitle">
+            <h1>Настройка рангов сотрудников</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Настройки</li>
+                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid d-flex bg-white p-3">
+    <div class="w-25 me-3">
+        @foreach (var item in Model)
+        {
+            <p role="button"
+                   class="border-bottom border-2 employee-selector"
+                   data-employee-id="@item.Id">
+                @item.GetFullName()
+            </p>
+        }
+    </div>
+    
+    <!-- Контейнер для подгружаемого контента -->
+    <div class="w-100" id="salary-data-container">
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-person-lines-fill fs-1"></i>
+            <p>Выберите сотрудника для просмотра данных</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentEmployeeId = null;
+
+        $(document).ready(function() {
+            const $container = $('#salary-data-container');
+
+            $('.employee-selector').on('click', function() {
+                const $this = $(this);
+                const employeeId = $this.data('employee-id');
+                
+                $('.employee-selector').removeClass('active');
+                $this.addClass('active');
+                currentEmployeeId = employeeId;
+                
+                $container.html(`
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2 text-muted">Загрузка данных...</p>
+                    </div>
+                `);
+                
+                $.get(`/Wages/get-data/${employeeId}`)
+                    .done(html => $container.html(html))
+                    .fail(() => $container.html('<div class="alert alert-danger m-3">Ошибка загрузки данных</div>'));
+            });
+
+            $container.on('click', '[data-bs-toggle="collapse"]', function() {
+                const $arrow = $(this).find('.collapse-arrow');
+                $arrow.text($arrow.text() === '▼' ? '▶' : '▼');
+            });
+        });
+
+        window.selectBonusGradation = function(cell) {
+            const $cell = $(cell);
+            const bonusId = $cell.data('bonus-id');
+            const gradationId = $cell.data('gradation-id');
+            const price = parseFloat($cell.data('price'));
+            
+            $(`.bonus-sum-cell[data-bonus-id="${bonusId}"]`).removeClass('bg-success text-white fw-bold');
+            $cell.addClass('bg-success text-white fw-bold');
+            
+            $.post('/Wages/update-employee-bonus', {
+                employeeId: currentEmployeeId,
+                bonusId: bonusId,
+                gradationId: gradationId
+            })
+            .done(response => {
+                $('#bonuses-subtotal').text(response.bonusesTotal.toFixed(2));
+                $('#grand-total').text(response.grandTotal.toFixed(2));
+            })
+            .fail(() => {
+                alert('Ошибка сохранения');
+                $cell.removeClass('bg-success text-white fw-bold');
+            });
+        };
+    </script>
+
+    <style>
+        .employee-selector {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+            .employee-selector:hover {
+                background-color: #f8f9fa;
+            }
+
+        [data-bs-toggle="collapse"] {
+            cursor: pointer;
+            user-select: none;
+        }
+
+            [data-bs-toggle="collapse"]:hover {
+                background-color: #f8f9fa;
+            }
+
+        .amount-input.is-valid {
+            border-color: #198754;
+            background-color: #d1e7dd;
+        }
+
+        .amount-input.is-invalid {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+    </style>
+}

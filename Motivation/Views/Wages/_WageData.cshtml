@@ -1,0 +1,145 @@
+﻿@model Motivation.ViewModels.EmployeeWageViewModel
+@{
+    // Подготавливаем HashSet для быстрой проверки назначенных бонусов
+    var assignedBonusGradationIds = Model.EmployeeBonuses
+        .Select(eb => eb.BonusGradationId)
+        .ToHashSet();
+}
+
+<div class="w-100">
+    <!-- Секция задач -->
+    <p role="button"
+           class="w-100 border-bottom border-2 text-black user-select-none fw-bold"
+           data-bs-toggle="collapse"
+           data-bs-target="#tasks-holder">
+        Задачи
+        <span class="float-end me-2 collapse-arrow">▼</span>
+    </p>
+    <div class="w-100 collapse show ps-2" id="tasks-holder">
+        <table class="table table-sm table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Задача</th>
+                    <th style="width: 130px;">Сумма</th>
+                    <th style="width: 80px;">Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Tasks.Any())
+                {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-3">
+                            Нет активных задач
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var task in Model.Tasks)
+                    {
+                        <tr>
+                            <td>@task.Title</td>
+@*                             <td>
+                                <input type="number"
+                                       class="form-control form-control-sm amount-input"
+                                       value="@task.Pro.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)"
+                                       data-type="task"
+                                       data-id="@task.Id"
+                                       step="0.01"
+                                       min="0" />
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox"
+                                       class="form-check-input task-checkbox"
+                                       data-task-id="@task.Id"
+                                @(task.IsCompleted ? "checked" : "") />
+                            </td> *@
+                        </tr>
+                    }
+                }
+            </tbody>
+            <tfoot>
+                <tr class="table-light fw-bold">
+   @*                  <th>Итого по задачам:</th>
+                    <th><span id="tasks-subtotal">@Model.Tasks.Sum(t => t.Amount).ToString("F2")</span></th>
+                    <th></th> *@
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Секция бонусов -->
+    <p role="button"
+           class="w-100 border-bottom border-2 text-black user-select-none mt-2 fw-bold"
+           data-bs-toggle="collapse"
+           data-bs-target="#bonuses-holder">
+        Мотивация
+        <span class="float-end me-2 collapse-arrow">▼</span>
+    </p>
+    <div class="w-100 collapse show ps-2" id="bonuses-holder">
+        @if (!Model.Bonuses.Any())
+        {
+            <div class="text-center text-muted py-3">
+                Нет доступных бонусов для должности
+            </div>
+        }
+        else
+        {
+            @foreach (var bonus in Model.Bonuses)
+            {
+                <div class="bonus-group mb-3">
+                    <h6 class="bg-light p-2 mb-2">@bonus.Label</h6>
+                    <table class="table table-sm table-bordered mb-0">
+                        <!-- Строка с названиями градаций (условиями) -->
+                        <thead>
+                            <tr>
+                                @foreach (var gradation in bonus.Gradations.OrderBy(g => g.Price))
+                                {
+                                    <th class="text-center bg-light">@gradation.Label</th>
+                                }
+                            </tr>
+                        </thead>
+                        <!-- Строка с суммами (кликабельная) -->
+                        <tbody>
+                            <tr>
+                                @foreach (var gradation in bonus.Gradations.OrderByDescending(g => g.Price))
+                                {
+                                    var isAssigned = assignedBonusGradationIds.Contains(gradation.Id);
+                                    <td role="button"
+                                        class="text-center bonus-sum-cell @(isAssigned ? "bg-success text-white fw-bold" : "")"
+                                        style="cursor: pointer;"
+                                        data-bonus-id="@bonus.Id"
+                                        data-gradation-id="@gradation.Id"
+                                        data-price="@gradation.Price.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)"
+                                        onclick="selectBonusGradation(this)">
+                                        @gradation.Price.ToString("F2") ₽
+                                    </td>
+                                }
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            }
+        
+            <div class="d-flex justify-content-end mt-2 pt-2 border-top">
+                <p class="fw-bold mb-0">
+                    Итого мотивация:
+                    <span id="bonuses-subtotal">
+                        @Model.EmployeeBonuses.Sum(eb => eb.BonusGradation?.Price ?? 0).ToString("F2")
+                    </span> ₽
+                </p>
+            </div>
+        }
+    </div>
+    <!-- Общий итог -->
+    <div class="d-flex justify-content-end mt-3 pt-2 border-top">
+        <p class="fs-5 mb-0">
+            <strong>
+                Итого:
+                <span id="grand-total">
+                    @((Model.Tasks.Sum(t => t.Price) + Model.EmployeeBonuses.Sum(eb => eb.BonusGradation?.Price ?? 0)).ToString("F2"))
+                </span> ₽
+            </strong>
+        </p>
+    </div>
+</div>

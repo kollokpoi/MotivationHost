@@ -1,0 +1,58 @@
+﻿@model LoginModel
+@{
+    ViewData["Title"] = "LogIn";
+    Layout = "_EmptyLayout";
+}
+
+<div class="container register d-flex flex-column align-items-center justify-content-center">
+    <div class="row  h-100 justify-content-center align-items-center">
+        <div class="w-50 d-flex flex-column align-items-center justify-content-center">
+            <div class="d-flex justify-content-center py-4">
+                <a href="index.html" class="logo d-flex align-items-center w-auto">
+                    <img src="~/images/logo.png" alt="">
+                    <span class="d-none d-lg-block">Background</span>
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="pt-4 pb-2">
+                        <h5 class="card-title text-center pb-0 fs-4">Авторизация</h5>
+                        <p class="text-center small">Введите Вашу почту и пароль для авторизации</p>
+                    </div>
+
+                    <form class="row g-3 needs-validation" method="post">
+                        <div>
+                            <label for="yourUsername" class="form-label">Почта</label>
+                            <div class="input-group has-validation">
+                                <span class="input-group-text" id="inputGroupPrepend">@@</span>
+                                <input type="text" name="Email" class="form-control" id="yourUsername" required>
+                                <div class="invalid-feedback">Введите Вашу почту</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="yourPassword" class="form-label">Пароль</label>
+                            <input type="password" name="Password" class="form-control" id="yourPassword" required>
+                            <div class="invalid-feedback">Введите Ваш пароль</div>
+                        </div>
+
+                        <div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="RememberMe" value="true" id="rememberMe">
+                                <label class="form-check-label" for="rememberMe">Запомнить меня</label>
+                            </div>
+                        </div>
+
+                        <div class="text-danger" asp-validation-summary="All"></div>
+
+                        <div>
+                            <button class="btn btn-primary w-100" type="submit">Авторизация</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
