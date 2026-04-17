@@ -46,18 +46,29 @@ namespace Motivation.Data.Repositories
                 var portal = await GetCurrentPortalAsync();
                 if (portal != null)
                 {
-                    var action = employee.BitrixUserId > 0 ? "UPDATE" : "ADD";
-                    var result = await _bitrixSyncService.SyncUserAsync(portal, employee, action);
-                    
-                    if (result?.Success == true && result.ExternalId.HasValue)
+                    // Запускаем синхронизацию в фоне, не дожидаясь завершения
+                    _ = Task.Run(async () =>
                     {
-                        employee.BitrixUserId = result.ExternalId.Value;
-                        await _context.SaveChangesAsync();
-                    }
-                    else if (result?.Success == false)
-                    {
-                        _logger.LogWarning($"Не удалось синхронизировать пользователя {employee.GetShortName()} с Bitrix: {result.Error}");
-                    }
+                        try
+                        {
+                            var action = employee.BitrixUserId > 0 ? "UPDATE" : "ADD";
+                            var result = await _bitrixSyncService.SyncUserAsync(portal, employee, action);
+                            
+                            if (result?.Success == true && result.ExternalId.HasValue)
+                            {
+                                employee.BitrixUserId = result.ExternalId.Value;
+                                await _context.SaveChangesAsync();
+                            }
+                            else if (result?.Success == false)
+                            {
+                                _logger.LogWarning($"Не удалось синхронизировать пользователя {employee.GetShortName()} с Bitrix: {result.Error}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Ошибка при фоновой синхронизации пользователя {employee.GetShortName()} с Bitrix");
+                        }
+                    });
                 }
             }
         }
@@ -82,12 +93,23 @@ namespace Motivation.Data.Repositories
                 var portal = await GetCurrentPortalAsync();
                 if (portal != null)
                 {
-                    var result = await _bitrixSyncService.SyncUserAsync(portal, employee, "UPDATE");
-                    
-                    if (result?.Success == false)
+                    // Запускаем синхронизацию в фоне, не дожидаясь завершения
+                    _ = Task.Run(async () =>
                     {
-                        _logger.LogWarning($"Не удалось обновить пользователя {employee.GetShortName()} в Bitrix: {result.Error}");
-                    }
+                        try
+                        {
+                            var result = await _bitrixSyncService.SyncUserAsync(portal, employee, "UPDATE");
+                            
+                            if (result?.Success == false)
+                            {
+                                _logger.LogWarning($"Не удалось обновить пользователя {employee.GetShortName()} в Bitrix: {result.Error}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Ошибка при фоновой синхронизации пользователя {employee.GetShortName()} с Bitrix");
+                        }
+                    });
                 }
             }
         }
@@ -102,18 +124,29 @@ namespace Motivation.Data.Repositories
                 var portal = await GetCurrentPortalAsync();
                 if (portal != null)
                 {
-                    foreach (var employee in employees)
+                    // Запускаем синхронизацию в фоне, не дожидаясь завершения
+                    _ = Task.Run(async () =>
                     {
-                        if (employee.BitrixUserId > 0)
+                        try
                         {
-                            var result = await _bitrixSyncService.SyncUserAsync(portal, employee, "UPDATE");
-                            
-                            if (result?.Success == false)
+                            foreach (var employee in employees)
                             {
-                                _logger.LogWarning($"Не удалось обновить пользователя {employee.GetShortName()} в Bitrix: {result.Error}");
+                                if (employee.BitrixUserId > 0)
+                                {
+                                    var result = await _bitrixSyncService.SyncUserAsync(portal, employee, "UPDATE");
+                                    
+                                    if (result?.Success == false)
+                                    {
+                                        _logger.LogWarning($"Не удалось обновить пользователя {employee.GetShortName()} в Bitrix: {result.Error}");
+                                    }
+                                }
                             }
                         }
-                    }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Ошибка при фоновой пакетной синхронизации пользователей с Bitrix");
+                        }
+                    });
                 }
             }
         }
@@ -133,12 +166,23 @@ namespace Motivation.Data.Repositories
                 var portal = await GetCurrentPortalAsync();
                 if (portal != null)
                 {
-                    var result = await _bitrixSyncService.SyncUserAsync(portal, employee, "UPDATE");
-                    
-                    if (result?.Success == false)
+                    // Запускаем синхронизацию в фоне, не дожидаясь завершения
+                    _ = Task.Run(async () =>
                     {
-                        _logger.LogWarning($"Не удалось обновить статус пользователя {employee.GetShortName()} в Bitrix: {result.Error}");
-                    }
+                        try
+                        {
+                            var result = await _bitrixSyncService.SyncUserAsync(portal, employee, "UPDATE");
+                            
+                            if (result?.Success == false)
+                            {
+                                _logger.LogWarning($"Не удалось обновить статус пользователя {employee.GetShortName()} в Bitrix: {result.Error}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Ошибка при фоновой синхронизации статуса пользователя {employee.GetShortName()} с Bitrix");
+                        }
+                    });
                 }
             }
         }
@@ -154,12 +198,23 @@ namespace Motivation.Data.Repositories
                 var portal = await GetCurrentPortalAsync();
                 if (portal != null)
                 {
-                    var result = await _bitrixSyncService.DeleteUserAsync(portal, employee.BitrixUserId);
-                    
-                    if (result?.Success == false)
+                    // Запускаем синхронизацию в фоне, не дожидаясь завершения
+                    _ = Task.Run(async () =>
                     {
-                        _logger.LogWarning($"Не удалось удалить пользователя {employee.GetShortName()} из Bitrix: {result.Error}");
-                    }
+                        try
+                        {
+                            var result = await _bitrixSyncService.DeleteUserAsync(portal, employee.BitrixUserId);
+                            
+                            if (result?.Success == false)
+                            {
+                                _logger.LogWarning($"Не удалось удалить пользователя {employee.GetShortName()} из Bitrix: {result.Error}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Ошибка при фоновом удалении пользователя {employee.GetShortName()} из Bitrix");
+                        }
+                    });
                 }
             }
 

@@ -39,18 +39,29 @@ namespace Motivation.Data.Repositories
                 var portal = await GetCurrentPortalAsync();
                 if (portal != null)
                 {
-                    var action = string.IsNullOrEmpty(department.ExternalId?.ToString()) ? "ADD" : "UPDATE";
-                    var result = await _bitrixSyncService.SyncDepartmentAsync(portal, department, action);
-                    
-                    if (result?.Success == true && result.ExternalId.HasValue)
+                    // Запускаем синхронизацию в фоне, не дожидаясь завершения
+                    _ = Task.Run(async () =>
                     {
-                        department.ExternalId = result.ExternalId.Value;
-                        await _context.SaveChangesAsync();
-                    }
-                    else if (result?.Success == false)
-                    {
-                        _logger.LogWarning($"Не удалось синхронизировать подразделение {department.Name} с Bitrix: {result.Error}");
-                    }
+                        try
+                        {
+                            var action = string.IsNullOrEmpty(department.ExternalId?.ToString()) ? "ADD" : "UPDATE";
+                            var result = await _bitrixSyncService.SyncDepartmentAsync(portal, department, action);
+                            
+                            if (result?.Success == true && result.ExternalId.HasValue)
+                            {
+                                department.ExternalId = result.ExternalId.Value;
+                                await _context.SaveChangesAsync();
+                            }
+                            else if (result?.Success == false)
+                            {
+                                _logger.LogWarning($"Не удалось синхронизировать подразделение {department.Name} с Bitrix: {result.Error}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Ошибка при фоновой синхронизации подразделения {department.Name} с Bitrix");
+                        }
+                    });
                 }
             }
         }
@@ -75,12 +86,23 @@ namespace Motivation.Data.Repositories
                 var portal = await GetCurrentPortalAsync();
                 if (portal != null && department.ExternalId.HasValue)
                 {
-                    var result = await _bitrixSyncService.SyncDepartmentAsync(portal, department, "UPDATE");
-                    
-                    if (result?.Success == false)
+                    // Запускаем синхронизацию в фоне, не дожидаясь завершения
+                    _ = Task.Run(async () =>
                     {
-                        _logger.LogWarning($"Не удалось обновить подразделение {department.Name} в Bitrix: {result.Error}");
-                    }
+                        try
+                        {
+                            var result = await _bitrixSyncService.SyncDepartmentAsync(portal, department, "UPDATE");
+                            
+                            if (result?.Success == false)
+                            {
+                                _logger.LogWarning($"Не удалось обновить подразделение {department.Name} в Bitrix: {result.Error}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Ошибка при фоновой синхронизации подразделения {department.Name} с Bitrix");
+                        }
+                    });
                 }
             }
         }
@@ -96,12 +118,23 @@ namespace Motivation.Data.Repositories
                 var portal = await GetCurrentPortalAsync();
                 if (portal != null)
                 {
-                    var result = await _bitrixSyncService.DeleteDepartmentAsync(portal, department.ExternalId.Value);
-                    
-                    if (result?.Success == false)
+                    // Запускаем синхронизацию в фоне, не дожидаясь завершения
+                    _ = Task.Run(async () =>
                     {
-                        _logger.LogWarning($"Не удалось удалить подразделение {department.Name} из Bitrix: {result.Error}");
-                    }
+                        try
+                        {
+                            var result = await _bitrixSyncService.DeleteDepartmentAsync(portal, department.ExternalId.Value);
+                            
+                            if (result?.Success == false)
+                            {
+                                _logger.LogWarning($"Не удалось удалить подразделение {department.Name} из Bitrix: {result.Error}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Ошибка при фоновом удалении подразделения {department.Name} из Bitrix");
+                        }
+                    });
                 }
             }
 

@@ -43,17 +43,28 @@ namespace Motivation.Data.Repositories
                 var portal = await GetCurrentPortalAsync();
                 if (portal != null && task.ExternalId.HasValue)
                 {
-                    var result = await _bitrixSyncService.SyncTaskAsync(portal, task, "ADD");
-                    
-                    if (result?.Success == true && result.ExternalId.HasValue)
+                    // Запускаем синхронизацию в фоне, не дожидаясь завершения
+                    _ = Task.Run(async () =>
                     {
-                        task.ExternalId = result.ExternalId.Value;
-                        await _context.SaveChangesAsync();
-                    }
-                    else if (result?.Success == false)
-                    {
-                        _logger.LogWarning($"Не удалось синхронизировать задачу {task.Title} с Bitrix: {result.Error}");
-                    }
+                        try
+                        {
+                            var result = await _bitrixSyncService.SyncTaskAsync(portal, task, "ADD");
+                            
+                            if (result?.Success == true && result.ExternalId.HasValue)
+                            {
+                                task.ExternalId = result.ExternalId.Value;
+                                await _context.SaveChangesAsync();
+                            }
+                            else if (result?.Success == false)
+                            {
+                                _logger.LogWarning($"Не удалось синхронизировать задачу {task.Title} с Bitrix: {result.Error}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Ошибка при фоновой синхронизации задачи {task.Title} с Bitrix");
+                        }
+                    });
                 }
             }
         }
@@ -78,12 +89,23 @@ namespace Motivation.Data.Repositories
                 var portal = await GetCurrentPortalAsync();
                 if (portal != null)
                 {
-                    var result = await _bitrixSyncService.SyncTaskAsync(portal, task, "UPDATE");
-                    
-                    if (result?.Success == false)
+                    // Запускаем синхронизацию в фоне, не дожидаясь завершения
+                    _ = Task.Run(async () =>
                     {
-                        _logger.LogWarning($"Не удалось обновить задачу {task.Title} в Bitrix: {result.Error}");
-                    }
+                        try
+                        {
+                            var result = await _bitrixSyncService.SyncTaskAsync(portal, task, "UPDATE");
+                            
+                            if (result?.Success == false)
+                            {
+                                _logger.LogWarning($"Не удалось обновить задачу {task.Title} в Bitrix: {result.Error}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Ошибка при фоновой синхронизации задачи {task.Title} с Bitrix");
+                        }
+                    });
                 }
             }
         }
@@ -99,12 +121,23 @@ namespace Motivation.Data.Repositories
                 var portal = await GetCurrentPortalAsync();
                 if (portal != null)
                 {
-                    var result = await _bitrixSyncService.DeleteTaskAsync(portal, task.ExternalId.Value);
-                    
-                    if (result?.Success == false)
+                    // Запускаем синхронизацию в фоне, не дожидаясь завершения
+                    _ = Task.Run(async () =>
                     {
-                        _logger.LogWarning($"Не удалось удалить задачу {task.Title} из Bitrix: {result.Error}");
-                    }
+                        try
+                        {
+                            var result = await _bitrixSyncService.DeleteTaskAsync(portal, task.ExternalId.Value);
+                            
+                            if (result?.Success == false)
+                            {
+                                _logger.LogWarning($"Не удалось удалить задачу {task.Title} из Bitrix: {result.Error}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Ошибка при фоновом удалении задачи {task.Title} из Bitrix");
+                        }
+                    });
                 }
             }
 
