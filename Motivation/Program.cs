@@ -113,6 +113,7 @@ namespace Motivation
             builder.Services.AddScoped<IScoreSheetGenerator, IScoreSheetGenerator>();
 
             // Bitrix Integration
+            builder.Services.AddScoped<IFieldMappingService, FieldMappingService>();
             builder.Services.AddHttpClient<BitrixSyncService>();
             builder.Services.AddScoped<IBitrixSyncService, BitrixSyncService>();
             builder.Services.AddScoped<BitrixTasksRepository, BitrixTasksRepository>();

@@ -24,6 +24,11 @@ namespace Motivation.Models
 
         public DateTime? LastSyncAt { get; set; }
 
+        /// <summary>
+        /// Навигационное свойство для настроек маппинга полей
+        /// </summary>
+        public virtual ICollection<FieldMapping>? FieldMappings { get; set; }
+
         [NotMapped]
         public List<Department>? Departments { get; set; }
 
