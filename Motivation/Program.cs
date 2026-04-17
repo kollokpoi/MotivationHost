@@ -90,7 +90,8 @@ namespace Motivation
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddScoped<IRepository<Department>, DepartmentsRepository>();
+            builder.Services.AddScoped<IRepository<Department>, SyncEnabledDepartmentsRepository>();
+            builder.Services.AddScoped<ISyncEnabledDepartmentsRepository, SyncEnabledDepartmentsRepository>();
             builder.Services.AddScoped<IRepository<Position>, PositionsRepository>();
             builder.Services.AddScoped<IRepository<Qualification>, QualificationsRepository>();
             builder.Services.AddScoped<IRepository<Rank>, RanksRepository>();
@@ -112,8 +113,18 @@ namespace Motivation
             builder.Services.AddScoped<IScoreSheetGenerator, IScoreSheetGenerator>();
 
             // Bitrix Integration
+            builder.Services.AddHttpClient<BitrixSyncService>();
+            builder.Services.AddScoped<IBitrixSyncService, BitrixSyncService>();
             builder.Services.AddScoped<BitrixTasksRepository, BitrixTasksRepository>();
             builder.Services.AddScoped<BitrixTimemanRepository, BitrixTimemanRepository>();
+            
+            // Sync-enabled repositories for Bitrix24 integration
+            builder.Services.AddScoped<IRepository<Department>, SyncEnabledDepartmentsRepository>();
+            builder.Services.AddScoped<ISyncEnabledDepartmentsRepository, SyncEnabledDepartmentsRepository>();
+            builder.Services.AddScoped<IRepository<Employee>, SyncEnabledEmployeesRepository>();
+            builder.Services.AddScoped<ISyncEnabledEmployeesRepository, SyncEnabledEmployeesRepository>();
+            builder.Services.AddScoped<IRepository<EmployeeTask>, SyncEnabledTasksRepository>();
+            builder.Services.AddScoped<ISyncEnabledTasksRepository, SyncEnabledTasksRepository>();
 
             var app = builder.Build();
 

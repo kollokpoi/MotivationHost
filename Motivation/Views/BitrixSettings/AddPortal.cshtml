@@ -1,0 +1,64 @@
+@model BitrixPortal
+@{
+    ViewData["Title"] = "Добавить портал";
+}
+
+<div class="pagetitle">
+    <h1>Добавить портал Bitrix24</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Главная</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Настройки Bitrix24</a></li>
+            <li class="breadcrumb-item active">Добавить портал</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section dashboard">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Информация о портале</h5>
+                    <form asp-action="AddPortal" method="post">
+                        <div class="mb-3">
+                            <label for="Name" class="form-label">Название портала</label>
+                            <input type="text" class="form-control" asp-for="Name" id="Name" required>
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="PortalUrl" class="form-label">URL портала</label>
+                            <input type="url" class="form-control" asp-for="PortalUrl" id="PortalUrl" required placeholder="https://your-company.bitrix24.ru">
+                            <span asp-validation-for="PortalUrl" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="WebhookUrl" class="form-label">URL входящего вебхука</label>
+                            <input type="url" class="form-control" asp-for="WebhookUrl" id="WebhookUrl" required>
+                            <span asp-validation-for="WebhookUrl" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="IncomingSecret" class="form-label">Секретный ключ для входящих вебхуков</label>
+                            <input type="text" class="form-control" asp-for="IncomingSecret" id="IncomingSecret">
+                            <small class="text-muted">Используется для проверки подлинности запросов от Bitrix24</small>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" asp-for="IsActive" id="IsActive">
+                            <label class="form-check-label" for="IsActive">Активный портал</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Добавить портал</button>
+                        <a asp-action="Index" class="btn btn-secondary">Отмена</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
