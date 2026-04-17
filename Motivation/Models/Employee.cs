@@ -17,6 +17,11 @@ namespace Motivation.Models
         [Key]
         public int Id { get; set; }
 
+        public int? PortalId { get; set; }
+
+        [ForeignKey("PortalId")]
+        public BitrixPortal? Portal { get; set; }
+
         public string UserId { get; set; } = string.Empty;
 
         public int DepartmentId { get; set; }

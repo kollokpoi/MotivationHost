@@ -1,0 +1,91 @@
+@model Motivation.Models.FieldMapping
+
+@{
+    ViewData["Title"] = "Редактировать маппинг поля";
+    var portalId = ViewBag.PortalId as int? ?? Model.PortalId;
+    var entityType = ViewBag.EntityType as string ?? Model.EntityType;
+}
+
+<div class="container mt-4">
+    <h1>Редактировать маппинг поля</h1>
+    
+    <div class="mb-3">
+        <a asp-action="Index" asp-route-portalId="@portalId" asp-route-entityType="@entityType" class="btn btn-secondary">← Назад к списку</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="PortalId" />
+                <input type="hidden" asp-for="EntityType" />
+                <input type="hidden" asp-for="CreatedAt" />
+
+                <div class="mb-3">
+                    <label asp-for="LocalFieldName" class="form-label">Локальное поле *</label>
+                    <input asp-for="LocalFieldName" class="form-control" required />
+                    <span asp-validation-for="LocalFieldName" class="text-danger"></span>
+                    <small class="form-text text-muted">Имя свойства в C# модели</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BitrixCode" class="form-label">Код поля в Bitrix24 *</label>
+                    <input asp-for="BitrixCode" class="form-control" required />
+                    <span asp-validation-for="BitrixCode" class="text-danger"></span>
+                    <small class="form-text text-muted">Код поля в API Битрикс24</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="MappingType" class="form-label">Тип преобразования</label>
+                    <select asp-for="MappingType" class="form-select">
+                        <option value="Direct">Прямое соответствие (Direct)</option>
+                        <option value="ConvertToDecimal">Преобразовать в число (ConvertToDecimal)</option>
+                        <option value="ToString">Преобразовать в строку (ToString)</option>
+                    </select>
+                    <small class="form-text text-muted">Как преобразовывать данные при синхронизации</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Описание</label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <small class="form-text text-muted">Необязательное описание назначения поля</small>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label">Активно</label>
+                    <small class="form-text text-muted d-block">Неактивные маппинги не используются при синхронизации</small>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a asp-action="Index" asp-route-portalId="@portalId" asp-route-entityType="@entityType" class="btn btn-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card bg-light">
+                <div class="card-header">
+                    <h5>Информация</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>ID:</strong> @Model.Id</p>
+                    <p><strong>Сущность:</strong> @Model.EntityType</p>
+                    <p><strong>Портал:</strong> @Model.PortalId</p>
+                    <p><strong>Создано:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
+                    @if (Model.UpdatedAt.HasValue)
+                    {
+                        <p><strong>Обновлено:</strong> @Model.UpdatedAt.Value.ToString("dd.MM.yyyy HH:mm")</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

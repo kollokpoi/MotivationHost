@@ -1,0 +1,106 @@
+@model Motivation.Models.FieldMapping
+
+@{
+    ViewData["Title"] = "Добавить маппинг поля";
+    var portalId = ViewBag.PortalId as int? ?? Model.PortalId;
+    var entityType = ViewBag.EntityType as string ?? Model.EntityType;
+}
+
+<div class="container mt-4">
+    <h1>Добавить маппинг поля</h1>
+    
+    <div class="mb-3">
+        <a asp-action="Index" asp-route-portalId="@portalId" asp-route-entityType="@entityType" class="btn btn-secondary">← Назад к списку</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                
+                <input type="hidden" asp-for="PortalId" value="@portalId" />
+                <input type="hidden" asp-for="EntityType" value="@entityType" />
+
+                <div class="mb-3">
+                    <label asp-for="LocalFieldName" class="form-label">Локальное поле *</label>
+                    <input asp-for="LocalFieldName" class="form-control" placeholder="Например: Cost, Name, Description" required />
+                    <span asp-validation-for="LocalFieldName" class="text-danger"></span>
+                    <small class="form-text text-muted">Имя свойства в C# модели</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BitrixCode" class="form-label">Код поля в Bitrix24 *</label>
+                    <input asp-for="BitrixCode" class="form-control" placeholder="Например: BUDGET, UF_CRM_123" required />
+                    <span asp-validation-for="BitrixCode" class="text-danger"></span>
+                    <small class="form-text text-muted">Код поля в API Битрикс24</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="MappingType" class="form-label">Тип преобразования</label>
+                    <select asp-for="MappingType" class="form-select">
+                        <option value="Direct">Прямое соответствие (Direct)</option>
+                        <option value="ConvertToDecimal">Преобразовать в число (ConvertToDecimal)</option>
+                        <option value="ToString">Преобразовать в строку (ToString)</option>
+                    </select>
+                    <small class="form-text text-muted">Как преобразовывать данные при синхронизации</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Описание</label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <small class="form-text text-muted">Необязательное описание назначения поля</small>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label">Активно</label>
+                    <small class="form-text text-muted d-block">Неактивные маппинги не используются при синхронизации</small>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a asp-action="Index" asp-route-portalId="@portalId" asp-route-entityType="@entityType" class="btn btn-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card bg-light">
+                <div class="card-header">
+                    <h5>Справка</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Примеры полей для сущностей:</h6>
+                    
+                    <h6 class="mt-3">Department (Подразделение):</h6>
+                    <ul>
+                        <li><code>Name</code> → <code>NAME</code></li>
+                        <li><code>ParentId</code> → <code>PARENT</code></li>
+                        <li><code>Budget</code> → <code>BUDGET</code></li>
+                        <li><code>ManagerId</code> → <code>UF_DEPARTMENT_MANAGER_ID</code></li>
+                    </ul>
+
+                    <h6 class="mt-3">Employee (Сотрудник):</h6>
+                    <ul>
+                        <li><code>Email</code> → <code>EMAIL</code></li>
+                        <li><code>FirstName</code> → <code>NAME</code></li>
+                        <li><code>LastName</code> → <code>LAST_NAME</code></li>
+                        <li><code>Phone</code> → <code>WORK_PHONE</code></li>
+                    </ul>
+
+                    <h6 class="mt-3">EmployeeTask (Задача):</h6>
+                    <ul>
+                        <li><code>Title</code> → <code>TITLE</code></li>
+                        <li><code>Description</code> → <code>DESCRIPTION</code></li>
+                        <li><code>Cost</code> → <code>UF_TASK_COST</code></li>
+                        <li><code>DeadLine</code> → <code>DEADLINE</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

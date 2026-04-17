@@ -8,6 +8,12 @@ namespace Motivation.Models
     {
         [Key]
         public int Id { get; set; }
+
+        public int? PortalId { get; set; }
+
+        [ForeignKey("PortalId")]
+        public BitrixPortal? Portal { get; set; }
+
         public int? ParentId { get; set; }
        
         [ForeignKey("ParentId")]

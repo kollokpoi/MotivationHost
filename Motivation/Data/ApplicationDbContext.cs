@@ -32,6 +32,9 @@ namespace Motivation.Data
         public DbSet<Bonus> Bonuses { get; set; }
         public DbSet<BonusGradation> BonusGradations { get; set; }
         public DbSet<EmployeeBonus> EmployeeBonuses { get; set; }
+        public DbSet<BitrixPortal> BitrixPortals { get; set; }
+        public DbSet<BitrixSettings> BitrixSettings { get; set; }
+        public DbSet<FieldMapping> FieldMappings { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

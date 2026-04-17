@@ -14,6 +14,8 @@ namespace Motivation.Models
 
         public int SyncIntervalMinutes { get; set; } = 30;
         public bool SyncTasks { get; set; } = true;
+        public bool SyncUsers { get; set; } = true;
+        public bool SyncDepartments { get; set; } = true;
         public bool SyncDeals { get; set; } = false;
         public bool TwoWaySync { get; set; } = false;
 

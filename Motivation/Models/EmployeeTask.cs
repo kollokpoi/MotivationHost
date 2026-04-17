@@ -23,6 +23,11 @@ namespace Motivation.Models
         [Key]
         public int Id { get; set; }
 
+        public int? PortalId { get; set; }
+
+        [ForeignKey("PortalId")]
+        public BitrixPortal? Portal { get; set; }
+
         public int EmployeeId { get; set; }
 
         [ForeignKey("EmployeeId")]
@@ -41,6 +46,6 @@ namespace Motivation.Models
         public int Score { get; set; }
         public TaskStatus Status { get; set; } = TaskStatus.New;
         public TaskPriority Priority { get; set; } = TaskPriority.Medium;
-        public decimal Price { get; set; } = 0;
+        public decimal Cost { get; set; } = 0;
     }
 }
